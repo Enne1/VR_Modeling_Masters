@@ -11,11 +11,14 @@ public class GetSelectedObj : MonoBehaviour
     
     private Face _selectedFace;
     private bool _isDragging = false;
+    private bool _isExtrusion;
     private Vector3 _initialControllerPos;
-    private Vector3 _initialFaceCenter;    
+    private Vector3 _initialFaceCenter;
 
+    private WireframeWithVertecies _wireframeScript;
     
-    public GameObject rightController; // Assign the Meta right-hand controller in the Inspector
+    public GameObject rightController; // Assign the Meta right-hand controller in the Inspector for Extrution
+    public GameObject leftController; // Assign the Meta left-hand controller in the Inspector for Dragging
     public GameObject handlePrefab;
     
     public float minExtrudeDistance;
@@ -23,6 +26,7 @@ public class GetSelectedObj : MonoBehaviour
     void Start()
     {
         _objSelector = FindObjectOfType<ObjSelector>(); // Find the ObjSelector instance
+        HandleOnFace();
     }
 
     void Update()
@@ -30,6 +34,7 @@ public class GetSelectedObj : MonoBehaviour
         if (_objSelector != null && _objSelector.ClosestObj != null)
         {
             _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
+            _wireframeScript = _pbMesh.GetComponent<WireframeWithVertecies>();
         }
 
         if (_isDragging)
@@ -45,7 +50,14 @@ public class GetSelectedObj : MonoBehaviour
         if (_selectedFace == null) return;
 
         _isDragging = true;
-        _initialControllerPos = rightController.transform.position;
+        
+        if (_isExtrusion) {
+            _initialControllerPos = rightController.transform.position;
+        }
+        else {
+            _initialControllerPos = leftController.transform.position;
+        }
+        
         _initialFaceCenter = GetFaceCenter(_selectedFace);
     }
 
@@ -53,8 +65,10 @@ public class GetSelectedObj : MonoBehaviour
     {
         _isDragging = false;
         _selectedFace = null;
+        _isExtrusion = false;
         
         HandleOnFace();
+        _wireframeScript.UpdateVertexMarker();
     }
 
     void DragFace()
@@ -62,11 +76,18 @@ public class GetSelectedObj : MonoBehaviour
         if (_selectedFace == null || _pbMesh == null) return;
 
         // Get controller's current position
-        Vector3 controllerPos = rightController.transform.position;
-
+        Vector3 controllerPos;
+        if (_isExtrusion) {
+            controllerPos = rightController.transform.position;
+        }
+        else {
+            controllerPos = leftController.transform.position;
+        }
+        
         // Calculate the movement delta (how much the controller moved)
         Vector3 movementDelta = controllerPos - _initialControllerPos;
 
+        
         // Get the normal of the face
         Vector3 faceNormal = Math.Normal(_pbMesh, _selectedFace).normalized;
 
@@ -93,6 +114,7 @@ public class GetSelectedObj : MonoBehaviour
         if (closestFace != null)
         {
             ExtrudeFace(closestFace);
+            _isExtrusion = true;
             StartDraggingFace();
         }
         
@@ -137,30 +159,47 @@ public class GetSelectedObj : MonoBehaviour
 
     void ExtrudeFace(Face face)
     {
-        Debug.Log("Extruding");
+        //Vector3 localNormal = Math.Normal(_pbMesh, face);
+        //Vector3 worldNormal = _pbMesh.transform.TransformDirection(localNormal);
         List<Face> newFaces = new List<Face> { face };
-        _pbMesh.Extrude(newFaces, ExtrudeMethod.FaceNormal, .1f);
+        _pbMesh.Extrude(newFaces, ExtrudeMethod.FaceNormal, .001f);
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }
 
     void HandleOnFace()
     {
+        /*
+        Transform parentTransform = transform;
+         
+
+        // Loop through children in reverse order to avoid modification issues
+        for (int i = parentTransform.childCount - 1; i >= 0; i--)
+        {
+            
+            Transform child = parentTransform.GetChild(i);
+            Destroy(child.gameObject);
+            //if (child.CompareTag("FaceHandle"))
+            //{
+            //    Destroy(child.gameObject);
+            //}
+        }
+        */
         GameObject[] handles = GameObject.FindGameObjectsWithTag("FaceHandle");
 
         foreach (GameObject handle in handles)
         {
-            Debug.Log("Destroying handle: " + handle.name);
+            //Debug.Log("Destroying handle: " + handle.name);
             Destroy(handle);
         }
-
 
         foreach (Face face in _pbMesh.faces)
         {
             Vector3 faceCenter = GetFaceCenter(face);
 
-            Vector3 faceNormal = Math.Normal(_pbMesh, face);
-            Quaternion rotation = Quaternion.LookRotation(faceNormal);
+            //Vector3 faceNormal = Math.Normal(_pbMesh, face);
+            Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, face)); //Convert to worldspace
+            Quaternion rotation = Quaternion.LookRotation(faceNormal); // define normal rotation based on worldspace
 
             GameObject handle = Instantiate(handlePrefab, faceCenter, rotation);
             handle.transform.SetParent(_pbMesh.transform, true); // Attach handle to the cube
