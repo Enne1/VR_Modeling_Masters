@@ -4,24 +4,23 @@ using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
 
-public class GetSelectedObj : MonoBehaviour
+public class DragFeature : MonoBehaviour
 {
     private ObjSelector _objSelector;
     private ProBuilderMesh _pbMesh;
     
     private Face _selectedFace;
-    private bool _isDragging = false;
-    private bool _isExtrusion;
+    private bool _isDragging;
     private Vector3 _initialControllerPos;
     private Vector3 _initialFaceCenter;
+    private Vector3 _currControllerPos;
 
     private WireframeWithVertecies _wireframeScript;
     
-    public GameObject rightController; // Assign the Meta right-hand controller in the Inspector for Extrution
     public GameObject leftController; // Assign the Meta left-hand controller in the Inspector for Dragging
     public GameObject handlePrefab;
     
-    public float minExtrudeDistance;
+    public float minDragDistance;
 
     void Start()
     {
@@ -45,27 +44,19 @@ public class GetSelectedObj : MonoBehaviour
     
     public void StartDraggingFace()
     {
-        Debug.Log("StartDraggingFace");
         _selectedFace = GetClosestFace();
+        
         if (_selectedFace == null) return;
-
-        _isDragging = true;
         
-        if (_isExtrusion) {
-            _initialControllerPos = rightController.transform.position;
-        }
-        else {
-            _initialControllerPos = leftController.transform.position;
-        }
-        
+        _initialControllerPos = leftController.transform.position;
         _initialFaceCenter = GetFaceCenter(_selectedFace);
+        _isDragging = true;
     }
 
     public void StopDraggingFace()
     {
         _isDragging = false;
         _selectedFace = null;
-        _isExtrusion = false;
         
         HandleOnFace();
         _wireframeScript.UpdateVertexMarker();
@@ -74,23 +65,19 @@ public class GetSelectedObj : MonoBehaviour
     void DragFace()
     {
         if (_selectedFace == null || _pbMesh == null) return;
-
-        // Get controller's current position
-        Vector3 controllerPos;
-        if (_isExtrusion) {
-            controllerPos = rightController.transform.position;
-        }
-        else {
-            controllerPos = leftController.transform.position;
-        }
+        
+        _currControllerPos = leftController.transform.position;
         
         // Calculate the movement delta (how much the controller moved)
-        Vector3 movementDelta = controllerPos - _initialControllerPos;
+        Vector3 movementDelta = _currControllerPos - _initialControllerPos;
 
         
         // Get the normal of the face
-        Vector3 faceNormal = Math.Normal(_pbMesh, _selectedFace).normalized;
+        //Vector3 faceNormal = Math.Normal(_pbMesh, _selectedFace).normalized;
 
+        Vector3 localNormal = Math.Normal(_pbMesh, _selectedFace);
+        Vector3 faceNormal = _pbMesh.transform.TransformDirection(localNormal);
+        
         // Project the movement delta onto the face normal
         float movementAlongNormal = Vector3.Dot(movementDelta, faceNormal);
         Vector3 constrainedMovement = faceNormal * movementAlongNormal;
@@ -105,35 +92,22 @@ public class GetSelectedObj : MonoBehaviour
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }
-
-    
-    public void RightIndexTriggerDown()
-    {
-        Face closestFace = GetClosestFace();
-        
-        if (closestFace != null)
-        {
-            ExtrudeFace(closestFace);
-            _isExtrusion = true;
-            StartDraggingFace();
-        }
-        
-    }
     
     Face GetClosestFace()
     {
-        if (_pbMesh == null || rightController == null) return null;
-        
-        Vector3 controllerPos = rightController.transform.position;
+        if (_pbMesh == null || leftController == null) return null;
 
+        //Vector3 controllerPos = rightController.transform.position;
+        _currControllerPos = leftController.transform.position;
+        
         // float minDistance = float.MaxValue;
-        float minDistance = minExtrudeDistance;
+        float minDistance = minDragDistance;
         Face closestFace = null;
 
         foreach (Face face in _pbMesh.faces)
         {
             Vector3 faceCenter = GetFaceCenter(face);
-            float distance = Vector3.Distance(controllerPos, faceCenter);
+            float distance = Vector3.Distance(_currControllerPos, faceCenter);
 
             if (distance < minDistance)
             {
@@ -156,35 +130,9 @@ public class GetSelectedObj : MonoBehaviour
     
         return sum / count;
     }
-
-    void ExtrudeFace(Face face)
-    {
-        //Vector3 localNormal = Math.Normal(_pbMesh, face);
-        //Vector3 worldNormal = _pbMesh.transform.TransformDirection(localNormal);
-        List<Face> newFaces = new List<Face> { face };
-        _pbMesh.Extrude(newFaces, ExtrudeMethod.FaceNormal, .001f);
-        _pbMesh.ToMesh();
-        _pbMesh.Refresh();
-    }
-
+    
     void HandleOnFace()
     {
-        /*
-        Transform parentTransform = transform;
-         
-
-        // Loop through children in reverse order to avoid modification issues
-        for (int i = parentTransform.childCount - 1; i >= 0; i--)
-        {
-            
-            Transform child = parentTransform.GetChild(i);
-            Destroy(child.gameObject);
-            //if (child.CompareTag("FaceHandle"))
-            //{
-            //    Destroy(child.gameObject);
-            //}
-        }
-        */
         GameObject[] handles = GameObject.FindGameObjectsWithTag("FaceHandle");
 
         foreach (GameObject handle in handles)
@@ -205,8 +153,4 @@ public class GetSelectedObj : MonoBehaviour
             handle.transform.SetParent(_pbMesh.transform, true); // Attach handle to the cube
         }
     }
-    
-    
-    
-    
 }

@@ -6,13 +6,9 @@ using UnityEngine.ProBuilder;
 public class WireframeWithVertecies : MonoBehaviour
 {
     private ProBuilderMesh _pbMesh;
-    //private List<GameObject> _vertexMarkers = new List<GameObject>();
     public float vertexSize = 0.02f; // Adjust for VR visibility
     public GameObject markerPrefab;
     private GameObject _marker;
-    
-
-    //private bool _meshActive = false;
     
     private void Start()
     {
@@ -23,17 +19,10 @@ public class WireframeWithVertecies : MonoBehaviour
             Debug.Log("No ProBuilderMesh component found on this GameObject.");
             return;
         }
-        //_meshActive = true;
+        UpdateVertexMarker();
+        
     }
-/*
-    void Update()
-    {
-        if (_meshActive)
-        {
-            UpdateVertexMarker();
-        }
-    }
-*/
+
     public void UpdateVertexMarker()
     {
         Transform parentTransform = transform;
@@ -78,50 +67,3 @@ public class WireframeWithVertecies : MonoBehaviour
         }
     }
 }
-
-/*
-{
-public Color lineColor = Color.green;
-public float vertexSize = 0.02f; // Adjust for VR visibility
-private ProBuilderMesh pbMesh;
-private List<GameObject> vertexMarkers = new List<GameObject>();
-private List<LineRenderer> lineRenderers = new List<LineRenderer>();
-
-void Start()
-{
-    pbMesh = GetComponent<ProBuilderMesh>();
-    if (pbMesh == null)
-    {
-        Debug.LogError("No ProBuilderMesh component found on this GameObject.");
-        return;
-    }
-
-    CreateVertexMarkers();
-}
-
-void CreateVertexMarkers()
-{
-    List<int> vertices = new List<int>(); // "Vector3" to "int"
-    pbMesh.GetVertices(vertices); // Get the vertices' positions
-
-    foreach (Vector3 vertex in vertices)
-    {
-        GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        marker.transform.position = vertex;
-        marker.transform.localScale = Vector3.one * vertexSize;
-        marker.GetComponent<Renderer>().material.color = Color.red;
-        Destroy(marker.GetComponent<Collider>()); // Remove unnecessary collider
-        vertexMarkers.Add(marker);
-    }
-}
-
-void OnDestroy()
-{
-    foreach (var marker in vertexMarkers)
-        Destroy(marker);
-
-    foreach (var line in lineRenderers)
-        Destroy(line.gameObject);
-}
-}
-*/
