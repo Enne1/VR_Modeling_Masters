@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 5420404456338425471}
   - component: {fileID: 654033893556892326}
   - component: {fileID: 7679792547606963570}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ProBuilder_Default_Cube
   m_TagString: ProBuilderObj
   m_Icon: {fileID: 0}
@@ -302,7 +302,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c22777d6e868e4f2fb421913386b154e, type: 2}
+  - {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -395,3 +395,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   vertexSize: 0.02
   markerPrefab: {fileID: 8941700895052496571, guid: dcaabcf7a2103ba4ab520105875ce4e9, type: 3}
+  lineMaterial: {fileID: 2100000, guid: 5dbad53ce9bd84e428ecffe665ae90ad, type: 2}
+  updateWireframe: 0

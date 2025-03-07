@@ -10,13 +10,14 @@ public class GrapInteractor : MonoBehaviour
     private bool _isGrabbing;
     private Vector3 _relativeDistance;
     private Quaternion _relativeRotation;
+    private WireframeWithVertices _wireframeScript;
     
     public GameObject rightController;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _objSelector = FindObjectOfType<ObjSelector>(); // Find the ObjSelector instance
+        _objSelector = FindFirstObjectByType<ObjSelector>(); // Find the ObjSelector instance
     }
 
     // Update is called once per frame
@@ -25,6 +26,7 @@ public class GrapInteractor : MonoBehaviour
         if (_objSelector != null && _objSelector.ClosestObj != null)
         {
             _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
+            _wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
         }
         
         if (_isGrabbing) FollowController();
@@ -33,7 +35,9 @@ public class GrapInteractor : MonoBehaviour
     public void AttachToController()
     {
         if (_pbMesh == null) return;
-
+        
+        _wireframeScript.updateWireframe = true;
+        
         _controllerObjDistance = Vector3.Distance(_pbMesh.transform.position, rightController.transform.position);
         if (_controllerObjDistance <= maxAllowedGrabDistance)
         {
@@ -53,6 +57,7 @@ public class GrapInteractor : MonoBehaviour
     
     public void DetachFromController()
     {
+        _wireframeScript.updateWireframe = false;
         if (_pbMesh == null) return;
         _isGrabbing = false;
     }

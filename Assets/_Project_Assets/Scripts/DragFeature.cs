@@ -15,7 +15,7 @@ public class DragFeature : MonoBehaviour
     private Vector3 _initialFaceCenter;
     private Vector3 _currControllerPos;
 
-    private WireframeWithVertecies _wireframeScript;
+    private WireframeWithVertices _wireframeScript;
     
     public GameObject leftController; // Assign the Meta left-hand controller in the Inspector for Dragging
     public GameObject handlePrefab;
@@ -24,8 +24,8 @@ public class DragFeature : MonoBehaviour
 
     void Start()
     {
-        _objSelector = FindObjectOfType<ObjSelector>(); // Find the ObjSelector instance
-        HandleOnFace();
+        _objSelector = FindFirstObjectByType<ObjSelector>(); // Find the ObjSelector instance
+        //HandleOnFace();
     }
 
     void Update()
@@ -33,7 +33,7 @@ public class DragFeature : MonoBehaviour
         if (_objSelector != null && _objSelector.ClosestObj != null)
         {
             _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
-            _wireframeScript = _pbMesh.GetComponent<WireframeWithVertecies>();
+            _wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
         }
 
         if (_isDragging)
@@ -45,6 +45,7 @@ public class DragFeature : MonoBehaviour
     public void StartDraggingFace()
     {
         _selectedFace = GetClosestFace();
+        _wireframeScript.updateWireframe = true;
         
         if (_selectedFace == null) return;
         
@@ -57,9 +58,11 @@ public class DragFeature : MonoBehaviour
     {
         _isDragging = false;
         _selectedFace = null;
+        _wireframeScript.updateWireframe = false;
         
         HandleOnFace();
-        _wireframeScript.UpdateVertexMarker();
+        //_wireframeScript.UpdateVertexMarker();
+        //_wireframeScript.DrawEdges();
     }
 
     void DragFace()

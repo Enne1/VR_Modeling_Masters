@@ -15,7 +15,7 @@ public class ExtrudeFeature : MonoBehaviour
     private Vector3 _initialFaceCenter;
     private Vector3 _currControllerPos;
 
-    private WireframeWithVertecies _wireframeScript;
+    private WireframeWithVertices _wireframeScript;
     
     public GameObject rightController; // Assign the Meta right-hand controller in the Inspector for Extrution
     public GameObject handlePrefab;
@@ -24,7 +24,12 @@ public class ExtrudeFeature : MonoBehaviour
 
     void Start()
     {
-        _objSelector = FindObjectOfType<ObjSelector>(); // Find the ObjSelector instance
+        _objSelector = FindFirstObjectByType<ObjSelector>(); // Find the ObjSelector instance
+        //HandleOnFace();
+    }
+
+    public void InitialHandles()
+    {
         HandleOnFace();
     }
 
@@ -33,7 +38,7 @@ public class ExtrudeFeature : MonoBehaviour
         if (_objSelector != null && _objSelector.ClosestObj != null)
         {
             _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
-            _wireframeScript = _pbMesh.GetComponent<WireframeWithVertecies>();
+            _wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
         }
 
         if (_isDragging)
@@ -44,8 +49,6 @@ public class ExtrudeFeature : MonoBehaviour
     
     public void StartDraggingFace()
     {
-        _selectedFace = GetClosestFace();
-        
         if (_selectedFace == null) return;
         
         _initialControllerPos = rightController.transform.position;
@@ -57,9 +60,11 @@ public class ExtrudeFeature : MonoBehaviour
     {
         _isDragging = false;
         _selectedFace = null;
+        _wireframeScript.updateWireframe = false;
         
         HandleOnFace();
-        _wireframeScript.UpdateVertexMarker();
+        //_wireframeScript.UpdateVertexMarker();
+        //_wireframeScript.DrawEdges();
     }
 
     void DragFace()
@@ -95,9 +100,11 @@ public class ExtrudeFeature : MonoBehaviour
     
     public void RightIndexTriggerDown()
     {
+        _wireframeScript.updateWireframe = true;
         Face closestFace = GetClosestFace();
         if (closestFace != null)
         {
+            _selectedFace = closestFace;
             ExtrudeFace(closestFace);
             StartDraggingFace();
         }
@@ -143,10 +150,8 @@ public class ExtrudeFeature : MonoBehaviour
 
     void ExtrudeFace(Face face)
     {
-        //Vector3 localNormal = Math.Normal(_pbMesh, face);
-        //Vector3 worldNormal = _pbMesh.transform.TransformDirection(localNormal);
         List<Face> newFaces = new List<Face> { face };
-        _pbMesh.Extrude(newFaces, ExtrudeMethod.IndividualFaces, .05f);
+        _pbMesh.Extrude(newFaces, ExtrudeMethod.IndividualFaces, .1f);
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }

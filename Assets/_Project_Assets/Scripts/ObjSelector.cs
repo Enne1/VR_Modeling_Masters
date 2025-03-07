@@ -9,7 +9,6 @@ public class ObjSelector : MonoBehaviour
     public GameObject leftController;
     public GameObject ClosestObj { get; private set; } // Public property to access closest object
     
-    
     private GameObject[] _pbObjectsInScene;
     
     public void SelectObj()

@@ -16,8 +16,7 @@ GameObject:
   - component: {fileID: 6272688861055241894}
   - component: {fileID: 657878005888603470}
   - component: {fileID: 3544494014167593080}
-  - component: {fileID: -3726983973496869631}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ProBuilder_Default_Sphere
   m_TagString: ProBuilderObj
   m_Icon: {fileID: 0}
@@ -2245,7 +2244,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c22777d6e868e4f2fb421913386b154e, type: 2}
+  - {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2336,15 +2335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19ac51aa27dc0c74e87006b0898ecb67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &-3726983973496869631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3965772097482295262}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c88533d437789114d8dc23081fe52dfb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  vertexSize: 0.02
+  markerPrefab: {fileID: 8941700895052496571, guid: dcaabcf7a2103ba4ab520105875ce4e9, type: 3}
+  lineMaterial: {fileID: 2100000, guid: 5dbad53ce9bd84e428ecffe665ae90ad, type: 2}
+  updateWireframe: 0
