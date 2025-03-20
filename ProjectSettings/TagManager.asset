@@ -8,6 +8,8 @@ TagManager:
   - FaceHandle
   - VertexMarker
   - GrabInteractor
+  - Floor
+  - PadlockMarker
   layers:
   - Default
   - TransparentFX
@@ -20,7 +22,7 @@ TagManager:
   - ProBuilder Pyramid
   - ProBuilder Pipe
   - ProBuilder Cylinder
-  - 
+  - ObjManipulator
   - 
   - 
   - 

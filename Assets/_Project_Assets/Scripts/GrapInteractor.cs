@@ -4,33 +4,26 @@ using System.Linq;
 
 public class GrapInteractor : MonoBehaviour
 {
-    //private variables
     private ObjSelector _objSelector;
     private ProBuilderMesh _pbMesh;
-    private float _controllerObjDistance;
     private float _initialDistance;
     private bool _isGrabbing;
     private bool _isScaling;
     private Vector3 _relativeDistance;
     private Vector3 _initialScale;
     private Quaternion _relativeRotation;
-    
-    // Scripts
-    private WireframeWithVertices _wireframeScript;
-    
 
-    // Public variables
+    private WireframeWithVertices _wireframeScript;
+
     public GameObject rightController;
     public GameObject leftController;
     public float maxAllowedGrabDistance;
     
-    // Find the selected object
     void Start()
     {
         _objSelector = FindFirstObjectByType<ObjSelector>(); 
     }
 
-    // Continuously update the grabbing, or scaling
     void Update()
     {
         if (_objSelector != null && _objSelector.ClosestObj != null)
@@ -39,29 +32,24 @@ public class GrapInteractor : MonoBehaviour
             _wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
         }
         
-        // If only right hand trigger is pressed, perform grabbing
         if (_isGrabbing && !_isScaling) FollowController();
 
-        // If both right and left trigger is pressed, perform scaling
         if (_isGrabbing && _isScaling)
         {
             float currentDistance = Vector3.Distance(leftController.transform.position, rightController.transform.position);
             float scaleMultiplier = currentDistance / _initialDistance;
-
             ScaleProBuilderMesh(_initialScale * scaleMultiplier);
         }
     }
 
-    
-    // Calculate the distance and rotation difference between the right controller and shape, before starting to grab
+    // Use OverlapSphere instead of distance-to-center check
     public void AttachToController()
     {
         if (_pbMesh == null) return;
         
         _wireframeScript.updateWireframe = true;
-        
-        _controllerObjDistance = Vector3.Distance(_pbMesh.transform.position, rightController.transform.position);
-        if (_controllerObjDistance <= maxAllowedGrabDistance)
+
+        if (IsControllerNearObject(rightController.transform.position))
         {
             _relativeDistance = rightController.transform.InverseTransformPoint(_pbMesh.transform.position);
             _relativeRotation = Quaternion.Inverse(rightController.transform.rotation) * _pbMesh.transform.rotation;
@@ -69,7 +57,6 @@ public class GrapInteractor : MonoBehaviour
         }
     }
     
-    // Reset variables when releasing the object
     public void DetachFromController()
     {
         _wireframeScript.updateWireframe = false;
@@ -77,26 +64,22 @@ public class GrapInteractor : MonoBehaviour
         _isGrabbing = false;
     }
 
-    // Stick the object to the right controller, when holding down right hand trigger
     void FollowController()
     {
         _pbMesh.transform.position = rightController.transform.TransformPoint(_relativeDistance);
         _pbMesh.transform.rotation = rightController.transform.rotation * _relativeRotation;
     }
 
-    // Scale the object around its center when both hand triggers are held down
-    // Scaling is dependent on the distance between the controllers
     void ScaleProBuilderMesh(Vector3 targetScale)
     {
         Vector3[] vertices = _pbMesh.positions.ToArray();
         
-        // Calculate the geometric center of the ProBuilder mesh
         Vector3 center = Vector3.zero;
         foreach (var vertex in vertices)
         {
             center += vertex;
         }
-        center /= vertices.Length; // Average position of all vertices
+        center /= vertices.Length; 
 
         Vector3 scaleRatio = new Vector3(
             targetScale.x / transform.localScale.x,
@@ -109,13 +92,12 @@ public class GrapInteractor : MonoBehaviour
             vertices[i] = center + Vector3.Scale(vertices[i] - center, scaleRatio);
         }
 
-        transform.localScale = targetScale;  // Update GameObject scale
-        _pbMesh.positions = vertices;         // Apply ProBuilder scaling
+        transform.localScale = targetScale;
+        _pbMesh.positions = vertices;
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }
     
-    // Set variables to begin scaling
     public void StartScaling()
     {
         _isScaling = true;
@@ -123,9 +105,25 @@ public class GrapInteractor : MonoBehaviour
         _initialScale = transform.localScale;
     }
 
-    // Reset variables when stopping to scale
     public void StopScaling()
     {
         _isScaling = false;
     }
+
+    /// <summary>
+    /// Uses a spherical overlap check to see if the controller is close to any part of the object.
+    /// </summary>
+    private bool IsControllerNearObject(Vector3 controllerPosition)
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(controllerPosition, maxAllowedGrabDistance);
+        foreach (var collider in hitColliders)
+        {
+            if (collider.gameObject == _pbMesh.gameObject)
+            {
+                return true; // Controller is near the object
+            }
+        }
+        return false;
+    }
 }
+

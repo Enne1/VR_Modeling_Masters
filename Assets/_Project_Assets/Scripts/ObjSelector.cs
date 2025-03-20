@@ -19,10 +19,11 @@ public class ObjSelector : MonoBehaviour
     // Find and select the closest object to the controller when "A" is pressed
     public void SelectObj()
     {
-        _handleUpdater.ClearHandles();
+        //_handleUpdater = FindFirstObjectByType<HandleUpdater>();
+        
+        //_handleUpdater.ClearHandles();
         
         _pbObjectsInScene = GameObject.FindGameObjectsWithTag("ProBuilderObj"); // Find all objects with the tag
-        _handleUpdater = FindFirstObjectByType<HandleUpdater>();
         
         float distToController = float.MaxValue;
         float maxDist = 1f;
@@ -46,7 +47,7 @@ public class ObjSelector : MonoBehaviour
                 ClosestObj = pb;
             }
         }
-        _handleUpdater.HandleOnFace();
+        //_handleUpdater.HandleOnFace();
         
         // Set the closest object to the selected material
         if (ClosestObj != null)
