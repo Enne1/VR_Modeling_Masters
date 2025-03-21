@@ -17,8 +17,9 @@ GameObject:
   - component: {fileID: 654033893556892326}
   - component: {fileID: 7679792547606963570}
   - component: {fileID: 3802489143655378787}
-  - component: {fileID: 924898896102653116}
   - component: {fileID: 3462377314128753129}
+  - component: {fileID: 1112698831358492569}
+  - component: {fileID: 3436961411473528367}
   m_Layer: 6
   m_Name: ProBuilder_Default_Cube
   m_TagString: ProBuilderObj
@@ -413,22 +414,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handlePrefab: {fileID: 5692032654161529379, guid: 86417f15fc2054642bc15e1d5a437a4c, type: 3}
---- !u!114 &924898896102653116
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4912339518013422798}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a27e456827a67148baa34a80e01e24d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  padlockPrefab: {fileID: 1433194017094724886, guid: f0fd731e5f23b2f4c85cd92dd37c5202, type: 3}
-  updatePadlocks: 0
-  defaultMaterial: {fileID: 2100000, guid: 5dbad53ce9bd84e428ecffe665ae90ad, type: 2}
-  selectedMaterial: {fileID: 2100000, guid: c67f6652cfedb3440ad650fe312e2225, type: 2}
 --- !u!114 &3462377314128753129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -445,3 +430,29 @@ MonoBehaviour:
   padlockPrefab: {fileID: 1433194017094724886, guid: f0fd731e5f23b2f4c85cd92dd37c5202, type: 3}
   sphereRadius: 0.01
   padlockOffset: 0.02
+--- !u!114 &1112698831358492569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4912339518013422798}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73b8796b94be4eb45a6cb13965663817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isToggledOn: 0
+--- !u!114 &3436961411473528367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4912339518013422798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80a038218866261468e05a2f6f01e6ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectedPadlocks: []

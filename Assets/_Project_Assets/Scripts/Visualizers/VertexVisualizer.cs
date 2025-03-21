@@ -24,6 +24,11 @@ public class VertexVisualizer : MonoBehaviour
         if (_pbMesh != null)
         {
             UpdateVertexSpheresAndPadlocks();
+            
+            foreach( Transform child in transform)
+            {
+                child.gameObject.SetActive(false);
+            }
         }
     }
 

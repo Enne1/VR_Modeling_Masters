@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,15 +9,20 @@ public class DragVertex : MonoBehaviour
 {
     private ObjSelector _objSelector;
     private ProBuilderMesh _pbMesh;
-    private HashSet<int> _selectedVertexIndices = new HashSet<int>(); // Store all shared vertices
+    private HashSet<int> _selectedVertexIndices; // Store all shared vertices
     private bool _isDragging;
     private Vector3 _initialControllerPos;
-    private Vector3 _initialVertexPos;
-    private Transform _activeController; // The transform of the controller currently used for dragging
+    private Dictionary<int, Vector3> _initialVertexPositions;
+    private Transform _activeController;
+    private List<GameObject> _dragAlongList;
+    private GameObject[] _dragAlongGameObjects;
     
     void Start()
     {
+        _dragAlongList = new List<GameObject>();
         _objSelector = FindFirstObjectByType<ObjSelector>();
+        _selectedVertexIndices = new HashSet<int>();
+        _initialVertexPositions = new Dictionary<int, Vector3>();
     }
 
     void Update()
@@ -27,7 +33,7 @@ public class DragVertex : MonoBehaviour
         }
     }
 
-    // Start dragging a vertex (Now receives the controller transform as input)
+    // Start dragging vertices (Now receives the controller transform as input)
     public void StartDraggingVertex(Transform controllerTransform)
     {
         if (_objSelector == null || _objSelector.ClosestObj == null) return;
@@ -35,26 +41,63 @@ public class DragVertex : MonoBehaviour
         _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
         if (_pbMesh == null) return;
 
-        int closestVertex = GetClosestVertex(controllerTransform);
+        // Get list of vertices to move
+        _selectedVertexIndices.Clear();
+        _initialVertexPositions.Clear();
 
-        if (closestVertex != -1)
+        PadlockSelectedList padlockSelectedList = _pbMesh.transform.GetComponent<PadlockSelectedList>();
+        if (padlockSelectedList.selectedPadlocks != null)
         {
-            // Store active controller
-            _activeController = controllerTransform;
+            foreach (var padlock in padlockSelectedList.selectedPadlocks)
+            {
+                _dragAlongList.Add(padlock.transform.parent.gameObject);
+            }
+            _dragAlongGameObjects = _dragAlongList.ToArray();
+        }
 
-            // Find and store all connected (shared) vertices
-            _selectedVertexIndices.Clear();
+        
+        // Find initial vertex to drag
+        int closestVertexInitial = GetClosestVertex(controllerTransform);
+        if (closestVertexInitial != -1)
+        {
             foreach (var sharedVertex in _pbMesh.sharedVertices)
             {
-                if (sharedVertex.Contains(closestVertex))
+                if (sharedVertex.Contains(closestVertexInitial))
                 {
                     _selectedVertexIndices.UnionWith(sharedVertex);
                     break;
                 }
             }
+        }
+        
+        
+        // Collect all locked vertecies, to drag along
+        foreach (GameObject obj in _dragAlongGameObjects)
+        {
+            int closestVertex = GetClosestVertex(obj.transform);
+            if (closestVertex != -1)
+            {
+                foreach (var sharedVertex in _pbMesh.sharedVertices)
+                {
+                    if (sharedVertex.Contains(closestVertex))
+                    {
+                        _selectedVertexIndices.UnionWith(sharedVertex);
+                        break;
+                    }
+                }
+            }
+        }
 
+        if (_selectedVertexIndices.Count > 0)
+        {
+            _activeController = controllerTransform;
             _initialControllerPos = _activeController.position;
-            _initialVertexPos = _pbMesh.transform.TransformPoint(_pbMesh.positions[closestVertex]);
+            
+            foreach (int vertexIndex in _selectedVertexIndices)
+            {
+                _initialVertexPositions[vertexIndex] = _pbMesh.transform.TransformPoint(_pbMesh.positions[vertexIndex]);
+            }
+            
             _isDragging = true;
         }
     }
@@ -62,12 +105,15 @@ public class DragVertex : MonoBehaviour
     // Stop dragging and reset variables
     public void StopDraggingVertex()
     {
+        _dragAlongList.Clear();
+        Array.Clear(_dragAlongGameObjects, 0, _dragAlongGameObjects.Length);
         _isDragging = false;
         _selectedVertexIndices.Clear();
+        _initialVertexPositions.Clear();
         _activeController = null;
     }
 
-    // Move the selected vertex along with all connected vertices
+    // Move the selected vertices
     void DragVertexMove()
     {
         if (_selectedVertexIndices.Count == 0 || _pbMesh == null || _activeController == null) return;
@@ -75,33 +121,31 @@ public class DragVertex : MonoBehaviour
         Vector3 currentControllerPos = _activeController.position;
         Vector3 movementDelta = currentControllerPos - _initialControllerPos;
 
-        // Copy vertex positions so we can modify them
         List<Vector3> newPositions = _pbMesh.positions.ToList();
 
         foreach (int vertexIndex in _selectedVertexIndices)
         {
-            Vector3 newVertexPos = _initialVertexPos + movementDelta;
+            Vector3 newVertexPos = _initialVertexPositions[vertexIndex] + movementDelta;
             newPositions[vertexIndex] = _pbMesh.transform.InverseTransformPoint(newVertexPos);
         }
 
-        // Apply changes
         _pbMesh.positions = newPositions;
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }
 
-    // Get the closest vertex index to the given controller transform
-    int GetClosestVertex(Transform controllerTransform)
+    // Get the closest vertex index to the given transform
+    int GetClosestVertex(Transform referenceTransform)
     {
         if (_pbMesh == null) return -1;
 
-        Vector3 controllerPos = controllerTransform.position;
+        Vector3 referencePos = referenceTransform.position;
         float minDistance = float.MaxValue;
         int closestVertex = -1;
 
         for (int i = 0; i < _pbMesh.positions.Count; i++)
         {
-            float distance = Vector3.Distance(controllerPos, _pbMesh.transform.TransformPoint(_pbMesh.positions[i]));
+            float distance = Vector3.Distance(referencePos, _pbMesh.transform.TransformPoint(_pbMesh.positions[i]));
             if (distance < minDistance)
             {
                 minDistance = distance;

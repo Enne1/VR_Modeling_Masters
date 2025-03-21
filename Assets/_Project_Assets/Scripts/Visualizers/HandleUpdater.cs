@@ -19,6 +19,11 @@ public class HandleUpdater : MonoBehaviour
         if (_pbMesh != null)
         {
             UpdateHandles();
+            
+            foreach( Transform child in transform)
+            {
+                child.gameObject.SetActive(false);
+            }
         }
     }
 

@@ -38,6 +38,10 @@ public class ObjSelector : MonoBehaviour
             {
                 renderer.material = deselectedMat;
             }
+            foreach( Transform child in pb.transform)
+            {
+                child.gameObject.SetActive(false);
+            }
 
             // Find the closest object
             float distance = Vector3.Distance(pb.transform.position, leftController.transform.position);
@@ -52,6 +56,11 @@ public class ObjSelector : MonoBehaviour
         // Set the closest object to the selected material
         if (ClosestObj != null)
         {
+            foreach( Transform child in ClosestObj.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+            
             MeshRenderer renderer = ClosestObj.GetComponent<MeshRenderer>();
             if (renderer != null)
             {

@@ -1332,3 +1332,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isToggledOn: 0
+  selectedPadlocks: []

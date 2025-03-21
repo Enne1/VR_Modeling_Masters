@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class SelectionManager : MonoBehaviour
@@ -20,8 +22,8 @@ public class SelectionManager : MonoBehaviour
     public GameObject vertexDragManager;
     private DragVertex _vertexDragScript;
     
-    public GameObject lockManager;
-    private VertexLocker _lockVertexScript;
+    //public GameObject lockManager;
+    //private VertexLocker _lockVertexScript;
     
     [Header("Testing Material")]
     public Material sMat;
@@ -31,7 +33,12 @@ public class SelectionManager : MonoBehaviour
     //Private variables
     private string _currentSelection;
     private bool _rightTrigger;
-    
+    private List<GameObject> _selectedPadlocks;
+
+    private void Start()
+    {
+        _selectedPadlocks = new List<GameObject>();
+    }
 
     private void SelectObject(Transform controller)
     {
@@ -70,7 +77,6 @@ public class SelectionManager : MonoBehaviour
 
     private void HandleSelection(GameObject selectedObject)
     {
-        // Log the tag of the selected child object
         Debug.Log("Selected Object Tag: " + selectedObject.tag);
         
         _currentSelection = selectedObject.tag;
@@ -92,13 +98,10 @@ public class SelectionManager : MonoBehaviour
                     _dragScript = dragManager.GetComponent<DragFace_V2>();
                     _dragScript.StartDraggingFace();
                 }
-                
-                // Implement handle interaction (extrusion, dragging, etc.)
                 break;
 
             case "VertexMarker":
                 Debug.Log("Selected Vertex: " + selectedObject.name);
-                //selectedObject.GetComponent<MeshRenderer>().material = sMat;
                 
                 if (_rightTrigger)
                 {
@@ -110,55 +113,47 @@ public class SelectionManager : MonoBehaviour
                     _vertexDragScript = vertexDragManager.GetComponent<DragVertex>();
                     _vertexDragScript.StartDraggingVertex(leftController);
                 }
-                
-                // Implement vertex dragging logic
                 break;
 
             case "PadlockMarker":
-                //selectedObject.GetComponent<MeshRenderer>().material = sMat;
                 Debug.Log("Selected Padlock: " + selectedObject.name);
+    
+                // Ensure list is initialized
+                //if (_selectedPadlocks == null)
+                //{
+                //    _selectedPadlocks = new List<GameObject>();
+                //}
 
-                PadlockToggler _padlockToggle = selectedObject.GetComponent<PadlockToggler>();
-                //PadlockToggler _padlockToggle = selectedObject.GetComponent<PadlockToggler>();
-                if (_padlockToggle != null)
+                // Check if the PadlockToggler component is attached
+                PadlockToggler padlockToggler = selectedObject.GetComponent<PadlockToggler>();
+                PadlockSelectedList padlockSelectedList = selectedObject.transform.parent.parent.GetComponent<PadlockSelectedList>();
+                if (padlockToggler != null)
                 {
-                    _padlockToggle.SwitchToggle();
-                    Debug.Log("Padlock lock state: " + _padlockToggle.isToggledOn);
-                    if (_padlockToggle.isToggledOn)
+                    padlockToggler.SwitchToggle();
+                    Debug.Log("Padlock lock state: " + padlockToggler.isToggledOn);
+        
+                    if (padlockToggler.isToggledOn)
                     {
+                        padlockSelectedList.AddToPadlockList(selectedObject);
                         selectedObject.GetComponent<MeshRenderer>().material = sMat;
                     }
                     else
                     {
+                        // Remove the selected object from the list if it's there
+                        padlockSelectedList.RemoveFromPadlockList(selectedObject);
                         selectedObject.GetComponent<MeshRenderer>().material = dMat;
                     }
+
+                    // Debugging: Print out the list of selected padlocks
+                    Debug.Log("Number of Selected Padlocks: " + padlockSelectedList.selectedPadlocks.Count);
+                    Debug.Log("List of Selected Padlocks: " + string.Join(", ", padlockSelectedList.selectedPadlocks.ConvertAll(padlock => padlock.name).ToArray()));
                 }
-                else
+                else 
                 {
                     Debug.LogWarning("PadlockToggle component not found on selectedObject.");
                 }
-
-                
-                // Implement multi-selection logic
-                /*
-                if (_rightTrigger)
-                {
-                    _lockVertexScript = lockManager.GetComponent<VertexLocker>();
-                    _lockVertexScript.TogglePadlock(rightController.position);   
-                }
-                else
-                {
-                    //_lockScript = lockManager.GetComponent<PadlockAndFacelockVisualizer>();
-                    //_lockScript.SelectPadlock(leftController.position);
-                }
-                */
-                break;
-
-            default:
-                Debug.Log("Unknown Tag: " + selectedObject.name);  // If the tag doesn't match any of the expected ones
                 break;
         }
-
     }
 
     void StopSelection()
