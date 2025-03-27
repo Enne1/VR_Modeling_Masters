@@ -14,13 +14,13 @@ public class VertexVisualizer : MonoBehaviour
 
     public GameObject spherePrefab;  // Reference to the small sphere prefab
     public GameObject padlockPrefab; // Reference to the padlock prefab
-    public float sphereRadius = 0.05f;
+    //public float sphereRadius = 0.02f;
     public float padlockOffset = 0.1f; // Distance to place the padlock outside the vertex
-
+    
     void Start()
     {
         _pbMesh = GetComponent<ProBuilderMesh>();
-
+        
         if (_pbMesh != null)
         {
             UpdateVertexSpheresAndPadlocks();
@@ -71,7 +71,7 @@ public class VertexVisualizer : MonoBehaviour
                 else
                 {
                     GameObject sphere = Instantiate(spherePrefab, vertexPosition, Quaternion.identity);
-                    sphere.transform.localScale = Vector3.one * sphereRadius;
+                    //sphere.transform.localScale = Vector3.one * sphereRadius;
                     sphere.transform.SetParent(_pbMesh.transform, true);
                     _vertexSpheres[vertexIndex] = sphere;
                 }
@@ -94,6 +94,7 @@ public class VertexVisualizer : MonoBehaviour
                 else
                 {
                     GameObject padlock = Instantiate(padlockPrefab, padlockPosition, Quaternion.identity);
+                    //padlock.transform.localScale = Vector3.one * sphereRadius;
                     padlock.transform.SetParent(sphere.transform, true); // Set the sphere as the parent
                     padlock.AddComponent<PadlockToggle>(); // Attach the toggle script
                     _vertexPadlocks[vertexIndex] = padlock;

@@ -15,6 +15,9 @@ public class DragFace_V2 : MonoBehaviour
     private Vector3 _initialFaceCenter;
     private Vector3 _currControllerPos;
 
+    private LineRenderer _normalAxisLineRenderer;
+    public Material normalAxisMaterial;
+    
     // Scripts
     private WireframeWithVertices _wireframeScript;
     //private PadlockAndFacelockVisualizer _padlockScript;
@@ -27,6 +30,14 @@ public class DragFace_V2 : MonoBehaviour
     // Find other script instances in the scene
     void Start()
     {
+        // Initiate the Normal Axis Line
+        _normalAxisLineRenderer = gameObject.AddComponent<LineRenderer>();
+        _normalAxisLineRenderer.startWidth = 0.005f;
+        _normalAxisLineRenderer.endWidth = 0.005f;
+        _normalAxisLineRenderer.positionCount = 2;
+        _normalAxisLineRenderer.material = normalAxisMaterial;
+        _normalAxisLineRenderer.enabled = false;
+        
         _objSelector = FindFirstObjectByType<ObjSelector>(); // Find the ObjSelector instance
         //_handleUpdater = FindFirstObjectByType<HandleUpdater>();
     }
@@ -61,6 +72,14 @@ public class DragFace_V2 : MonoBehaviour
         _initialControllerPos = leftController.transform.position;
         _initialFaceCenter = GetFaceCenter(_selectedFace);
         _isDragging = true;
+        
+        Vector3 localNormal = Math.Normal(_pbMesh, _selectedFace);
+        Vector3 faceNormal = _pbMesh.transform.TransformDirection(localNormal);
+        _normalAxisLineRenderer.enabled = true;
+        _normalAxisLineRenderer.SetPosition(0, faceNormal * 100 + _initialFaceCenter);
+        _normalAxisLineRenderer.SetPosition(1, faceNormal * -100 + _initialFaceCenter); 
+        Debug.Log(localNormal);
+        Debug.Log(faceNormal);
     }
     
     // Reset variable when stopping a dragging
@@ -69,6 +88,7 @@ public class DragFace_V2 : MonoBehaviour
         _isDragging = false;
         _selectedFace = null;
         _wireframeScript.updateWireframe = false;
+        _normalAxisLineRenderer.enabled = false;
        // _padlockScript.updatePadlocks = false;
     }
 
@@ -92,7 +112,7 @@ public class DragFace_V2 : MonoBehaviour
     
         // Threshold for snapping (If the controller is moved away from the face normal,
         // The face can be dragged around freely, otherwise it is snapped to normal vector)
-        float snapThreshold = 0.1f; // Adjust this value for sensitivity
+        float snapThreshold = 0.025f; // Adjust this value for sensitivity
         float deviation = (movementDelta - constrainedMovement).magnitude;
     
         Vector3 finalMovement;

@@ -9926,7 +9926,7 @@ GameObject:
   - component: {fileID: 752010404}
   - component: {fileID: 752010403}
   m_Layer: 0
-  m_Name: Controller Buttons Mapper
+  m_Name: General Controls
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9964,44 +9964,13 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - Title: GrabObj
-    Button: 4194304
-    ButtonMode: 1
-    InputActionReference: {fileID: 0}
-    Callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 3705838}
-          m_TargetAssemblyTypeName: GrapInteractor, Assembly-CSharp
-          m_MethodName: AttachToController
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - Title: ReleaseObj
+  - Title: DeleteObj
     Button: 4194304
     ButtonMode: 0
     InputActionReference: {fileID: 0}
     Callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 3705838}
-          m_TargetAssemblyTypeName: GrapInteractor, Assembly-CSharp
-          m_MethodName: DetachFromController
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
         - m_Target: {fileID: 2053526366}
           m_TargetAssemblyTypeName: DeleteShape, Assembly-CSharp
           m_MethodName: Deletion
@@ -10014,35 +9983,16 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - Title: StartScaling
-    Button: 16384
+  - Title: ClearLog
+    Button: 2
     ButtonMode: 1
     InputActionReference: {fileID: 0}
     Callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 3705838}
-          m_TargetAssemblyTypeName: GrapInteractor, Assembly-CSharp
-          m_MethodName: StartScaling
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - Title: StopScaling
-    Button: 16384
-    ButtonMode: 0
-    InputActionReference: {fileID: 0}
-    Callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 3705838}
-          m_TargetAssemblyTypeName: GrapInteractor, Assembly-CSharp
-          m_MethodName: StopScaling
+        - m_Target: {fileID: 457578107}
+          m_TargetAssemblyTypeName: ConsoleToGUI, Assembly-CSharp
+          m_MethodName: ClearLog
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -11415,8 +11365,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 752010405}
-  - {fileID: 1862912497}
   - {fileID: 1223189754}
+  - {fileID: 1808055270}
+  - {fileID: 1862912497}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &868496474
@@ -13525,6 +13476,58 @@ Transform:
   m_Children: []
   m_Father: {fileID: 851933443}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1064920361
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1064920362}
+  - component: {fileID: 1064920363}
+  m_Layer: 0
+  m_Name: ProximityScalerManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1064920362
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064920361}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1765071498}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1064920363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1064920361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b023c6187ccd22439b5f08b718c97af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftController: {fileID: 651223790}
+  rightController: {fileID: 29748420}
+  scalableLayer:
+    serializedVersion: 2
+    m_Bits: 2048
+  minDistance: 0.075
+  maxDistance: 0.2
+  startScale: 0.01
 --- !u!1 &1070976890
 GameObject:
   m_ObjectHideFlags: 0
@@ -14743,7 +14746,7 @@ GameObject:
   - component: {fileID: 1223189756}
   - component: {fileID: 1223189755}
   m_Layer: 0
-  m_Name: Test New Selector
+  m_Name: Manipulation Tools
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14844,25 +14847,6 @@ MonoBehaviour:
         - m_Target: {fileID: 2045677377}
           m_TargetAssemblyTypeName: SelectionManager, Assembly-CSharp
           m_MethodName: RightIndexTriggerUp
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - Title: ClearLog
-    Button: 2
-    ButtonMode: 1
-    InputActionReference: {fileID: 0}
-    Callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 457578107}
-          m_TargetAssemblyTypeName: ConsoleToGUI, Assembly-CSharp
-          m_MethodName: ClearLog
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -15585,8 +15569,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rightController: {fileID: 29748419}
-  handlePrefab: {fileID: 5692032654161529379, guid: 86417f15fc2054642bc15e1d5a437a4c, type: 3}
+  handlePrefab: {fileID: 6893706580216731776, guid: 829f253edcca13c47a16fe928e0fa83a, type: 3}
   minExtrudeDistance: 0.2
+  minAllowedExtrudeDistance: 0.05
 --- !u!1 &1288689946
 GameObject:
   m_ObjectHideFlags: 0
@@ -18469,6 +18454,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cc1054d60f043247be5a082b5a35307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  normalAxisMaterial: {fileID: 2100000, guid: f74daa0c40e5dd148b8d657520832a38, type: 2}
   leftController: {fileID: 651223789}
   minDragDistance: 0.2
 --- !u!1 &1485071592
@@ -22815,6 +22801,7 @@ Transform:
   - {fileID: 1483968727}
   - {fileID: 1631216596}
   - {fileID: 2007188181}
+  - {fileID: 1064920362}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1775089438
@@ -23125,6 +23112,146 @@ Transform:
   - {fileID: 1273074032}
   m_Father: {fileID: 1429297201}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1808055267
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1808055270}
+  - component: {fileID: 1808055269}
+  - component: {fileID: 1808055268}
+  m_Layer: 0
+  m_Name: Grab Controls
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1808055268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808055267}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d376240d064f4484e81824d51391caf3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _buttonClickActions:
+  - Title: GrabObj
+    Button: 4194304
+    ButtonMode: 1
+    InputActionReference: {fileID: 0}
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3705838}
+          m_TargetAssemblyTypeName: GrapInteractor, Assembly-CSharp
+          m_MethodName: AttachToController
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Title: ReleaseObj
+    Button: 4194304
+    ButtonMode: 0
+    InputActionReference: {fileID: 0}
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3705838}
+          m_TargetAssemblyTypeName: GrapInteractor, Assembly-CSharp
+          m_MethodName: DetachFromController
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Title: StartScaling
+    Button: 16384
+    ButtonMode: 1
+    InputActionReference: {fileID: 0}
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3705838}
+          m_TargetAssemblyTypeName: GrapInteractor, Assembly-CSharp
+          m_MethodName: StartScaling
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Title: StopScaling
+    Button: 16384
+    ButtonMode: 0
+    InputActionReference: {fileID: 0}
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3705838}
+          m_TargetAssemblyTypeName: GrapInteractor, Assembly-CSharp
+          m_MethodName: StopScaling
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!114 &1808055269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808055267}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b023183069df224080314a560e6e1ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockId: 80aa2eb2-af2f-40a9-ad9e-18044ce65bee
+  instanceId: 4108fa55-299e-4d90-9675-32ed0a94b4a9
+  version: 1
+  installationRoutineCheckpoint:
+    _installationRoutineId: 
+    _installationVariants: []
+--- !u!4 &1808055270
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1808055267}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 865276165}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1809727166
 GameObject:
   m_ObjectHideFlags: 0
@@ -23244,7 +23371,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 0
   m_CookingOptions: 30
-  m_Mesh: {fileID: 1842160882}
+  m_Mesh: {fileID: 1533747299}
 --- !u!33 &1813118879
 MeshFilter:
   m_ObjectHideFlags: 10
@@ -26871,6 +26998,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1c0e72e267230442b9396c19a28152f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  proximityScalerManager: {fileID: 1064920361}
   deselectedMat: {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
   selectedMat: {fileID: 2100000, guid: 238906dd8082cc5418dc3021a9456f5b, type: 2}
   leftController: {fileID: 1699961308}
@@ -26911,7 +27039,6 @@ MonoBehaviour:
   extrudeManager: {fileID: 1283808456}
   dragManager: {fileID: 1483968726}
   vertexDragManager: {fileID: 1631216594}
-  lockManager: {fileID: 2007188179}
   sMat: {fileID: 2100000, guid: c67f6652cfedb3440ad650fe312e2225, type: 2}
   dMat: {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
 --- !u!1 &2049606928

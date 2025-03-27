@@ -11,6 +11,7 @@ public class HandleUpdater : MonoBehaviour
     private Dictionary<Face, Quaternion> _lastFaceRotations = new Dictionary<Face, Quaternion>();
 
     public GameObject handlePrefab;
+    //public float handleSize = 0.02f;
 
     void Start()
     {
@@ -66,6 +67,7 @@ public class HandleUpdater : MonoBehaviour
             else
             {
                 GameObject handle = Instantiate(handlePrefab, faceCenter, faceRotation);
+                //handle.transform.localScale = Vector3.one * handleSize;
                 handle.transform.SetParent(_pbMesh.transform, true);
                 _faceHandles[face] = handle;
             }

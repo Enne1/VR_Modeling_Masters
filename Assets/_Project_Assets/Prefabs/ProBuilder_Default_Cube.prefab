@@ -413,7 +413,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20d1686da82893b4a983c2f8734145b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handlePrefab: {fileID: 5692032654161529379, guid: 86417f15fc2054642bc15e1d5a437a4c, type: 3}
+  handlePrefab: {fileID: 6893706580216731776, guid: 829f253edcca13c47a16fe928e0fa83a, type: 3}
 --- !u!114 &3462377314128753129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -427,9 +427,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spherePrefab: {fileID: 8941700895052496571, guid: dcaabcf7a2103ba4ab520105875ce4e9, type: 3}
-  padlockPrefab: {fileID: 1433194017094724886, guid: f0fd731e5f23b2f4c85cd92dd37c5202, type: 3}
-  sphereRadius: 0.01
-  padlockOffset: 0.02
+  padlockPrefab: {fileID: 8933404996358485184, guid: 8abfb6b185c2fa049a21c8b851e655af, type: 3}
+  padlockOffset: 0.03
 --- !u!114 &1112698831358492569
 MonoBehaviour:
   m_ObjectHideFlags: 0

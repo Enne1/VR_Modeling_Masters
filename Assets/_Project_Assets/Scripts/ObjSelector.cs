@@ -10,6 +10,10 @@ public class ObjSelector : MonoBehaviour
     // Scripts
     private HandleUpdater _handleUpdater;
     
+    public GameObject proximityScalerManager;
+    private ProximityScaler _proximityScaler;
+    
+    
     //Public variables
     public Material deselectedMat;
     public Material selectedMat;
@@ -22,7 +26,6 @@ public class ObjSelector : MonoBehaviour
         //_handleUpdater = FindFirstObjectByType<HandleUpdater>();
         
         //_handleUpdater.ClearHandles();
-        
         _pbObjectsInScene = GameObject.FindGameObjectsWithTag("ProBuilderObj"); // Find all objects with the tag
         
         float distToController = float.MaxValue;
@@ -52,6 +55,8 @@ public class ObjSelector : MonoBehaviour
             }
         }
         //_handleUpdater.HandleOnFace();
+        _proximityScaler = proximityScalerManager.GetComponent<ProximityScaler>();
+        _proximityScaler.SetScales(ClosestObj);
         
         // Set the closest object to the selected material
         if (ClosestObj != null)
