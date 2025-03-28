@@ -19,7 +19,7 @@ public class DragFace_V2 : MonoBehaviour
     public Material normalAxisMaterial;
     
     // Scripts
-    private WireframeWithVertices _wireframeScript;
+    //private WireframeWithVertices _wireframeScript;
     //private PadlockAndFacelockVisualizer _padlockScript;
   //  private HandleUpdater _handleUpdater;
     
@@ -48,7 +48,7 @@ public class DragFace_V2 : MonoBehaviour
         if (_objSelector != null && _objSelector.ClosestObj != null)
         {
             _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
-            _wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
+            //_wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
             //_padlockScript = _pbMesh.GetComponent<PadlockAndFacelockVisualizer>();
         }
 
@@ -64,7 +64,7 @@ public class DragFace_V2 : MonoBehaviour
     public void StartDraggingFace()
     {
         _selectedFace = GetClosestFace();
-        _wireframeScript.updateWireframe = true;
+        //_wireframeScript.updateWireframe = true;
         //_padlockScript.updatePadlocks = true;
         
         if (_selectedFace == null) return;
@@ -87,7 +87,7 @@ public class DragFace_V2 : MonoBehaviour
     {
         _isDragging = false;
         _selectedFace = null;
-        _wireframeScript.updateWireframe = false;
+        //_wireframeScript.updateWireframe = false;
         _normalAxisLineRenderer.enabled = false;
        // _padlockScript.updatePadlocks = false;
     }

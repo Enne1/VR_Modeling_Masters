@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
@@ -84,20 +85,27 @@ public class VertexVisualizer : MonoBehaviour
             if (_vertexSpheres.ContainsKey(vertexIndex))
             {
                 GameObject sphere = _vertexSpheres[vertexIndex];
-                Vector3 padlockPosition = FindPadlockPosition(vertexPosition, normals[vertexIndex]);
-
+                //Vector3 padlockPosition = FindPadlockPosition(vertexPosition, normals[vertexIndex]);
+                Debug.Log("vertex Index: " + vertexIndex);
+                Vector3 padlockPosition = FindPadlockPosition(transform.InverseTransformPoint(vertexPosition), vertexIndex);
+                
+                //Debug.Log("World Space: " + vertexPosition);
+                //Debug.Log("Local Space: " + transform.InverseTransformPoint(vertexPosition));
                 // Create or update the padlock
                 if (_vertexPadlocks.ContainsKey(vertexIndex))
                 {
-                    _vertexPadlocks[vertexIndex].transform.position = padlockPosition;
+                    //_vertexPadlocks[vertexIndex].transform.position = padlockPosition;
                 }
                 else
                 {
                     GameObject padlock = Instantiate(padlockPrefab, padlockPosition, Quaternion.identity);
+                    
                     //padlock.transform.localScale = Vector3.one * sphereRadius;
-                    padlock.transform.SetParent(sphere.transform, true); // Set the sphere as the parent
+                    padlock.transform.SetParent(sphere.transform, false); // Set the sphere as the parent
+                    //padlock.transform.localRotation = Quaternion.identity;
                     padlock.AddComponent<PadlockToggle>(); // Attach the toggle script
                     _vertexPadlocks[vertexIndex] = padlock;
+                    
                 }
             }
 
@@ -105,11 +113,91 @@ public class VertexVisualizer : MonoBehaviour
         }
     }
 
-    Vector3 FindPadlockPosition(Vector3 vertexPosition, Vector3 normal)
+    Vector3 FindPadlockPosition(Vector3 vertexPosition, int vertexIndex)
     {
-        return vertexPosition + normal.normalized * padlockOffset;
+        Vector3 optimalDirection = GetFurthestDirection(vertexIndex);
+        Vector3 worldVertexPosition = transform.TransformPoint(vertexPosition);
+        Vector3 worldPadlockPosition = worldVertexPosition + optimalDirection * -padlockOffset;
+
+        //Debug.DrawLine(worldVertexPosition, worldPadlockPosition, Color.blue, 5f);
+
+        return transform.InverseTransformPoint(worldPadlockPosition);
     }
 
+
+    Vector3 GetFurthestDirection(int vertexIndex)
+    {
+        List<Vector3> faceNormals = GetConnectedFaceNormals(vertexIndex);
+        if (faceNormals.Count == 0)
+            return Vector3.up; // Default fallback
+
+        Vector3 sumNormals = Vector3.zero;
+        foreach (Vector3 normal in faceNormals)
+        {
+            sumNormals += normal;
+        }
+
+        if (sumNormals == Vector3.zero)
+            return Vector3.up; // Fallback case
+
+        Vector3 bestDirection = (-sumNormals).normalized; // Invert direction
+        return bestDirection;
+    }   
+
+    List<Vector3> GetConnectedFaceNormals(int vertexIndex)
+    {
+        List<Vector3> normals = new List<Vector3>();
+
+        // Get all shared vertex handles (groups of equivalent vertices)
+        HashSet<int> sharedIndexes = new HashSet<int>();
+
+        foreach (SharedVertex sharedVertex in _pbMesh.sharedVertices)
+        {
+            if (sharedVertex.Contains(vertexIndex))
+            {
+                sharedIndexes.UnionWith(sharedVertex);
+                break; // Stop after finding the matching shared vertex group
+            }
+        }
+
+        foreach (Face face in _pbMesh.faces)
+        {
+            // If any of the shared vertices exist in this face, consider it
+            if (face.indexes.Any(sharedIndexes.Contains))  
+            {
+                Vector3 localNormal = Math.Normal(_pbMesh, face); // Local space normal
+                Vector3 worldNormal = _pbMesh.transform.TransformDirection(localNormal); // Convert to world space
+            
+                normals.Add(worldNormal);
+
+                // Debug visualization
+                Vector3 faceCenter = GetFaceCenter(face);
+                //Debug.DrawLine(faceCenter, faceCenter + worldNormal * 0.2f, Color.green, 5f);
+            }
+        }
+
+        return normals;
+    }
+
+
+
+
+
+    Vector3 GetFaceCenter(Face face)
+    {
+        Vector3 sum = Vector3.zero;
+        int count = face.indexes.Count;
+            
+        foreach (int index in face.indexes)
+        {
+            sum += _pbMesh.transform.TransformPoint(_pbMesh.positions[index]); // Convert local space to world space
+        }
+        
+        return sum / count;
+    }
+
+
+    
     List<int> GetModifiedVertices()
     {
         List<int> modifiedVertices = new List<int>();

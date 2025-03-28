@@ -15,10 +15,8 @@ GameObject:
   - component: {fileID: 2506455934462359319}
   - component: {fileID: 5420404456338425471}
   - component: {fileID: 654033893556892326}
-  - component: {fileID: 7679792547606963570}
   - component: {fileID: 3802489143655378787}
   - component: {fileID: 3462377314128753129}
-  - component: {fileID: 1112698831358492569}
   - component: {fileID: 3436961411473528367}
   m_Layer: 6
   m_Name: ProBuilder_Default_Cube
@@ -385,22 +383,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &7679792547606963570
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4912339518013422798}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19ac51aa27dc0c74e87006b0898ecb67, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  vertexSize: 0.02
-  markerPrefab: {fileID: 8941700895052496571, guid: dcaabcf7a2103ba4ab520105875ce4e9, type: 3}
-  lineMaterial: {fileID: 2100000, guid: 5dbad53ce9bd84e428ecffe665ae90ad, type: 2}
-  updateWireframe: 0
 --- !u!114 &3802489143655378787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -428,20 +410,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spherePrefab: {fileID: 8941700895052496571, guid: dcaabcf7a2103ba4ab520105875ce4e9, type: 3}
   padlockPrefab: {fileID: 8933404996358485184, guid: 8abfb6b185c2fa049a21c8b851e655af, type: 3}
-  padlockOffset: 0.03
---- !u!114 &1112698831358492569
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4912339518013422798}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73b8796b94be4eb45a6cb13965663817, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isToggledOn: 0
+  padlockOffset: 1
 --- !u!114 &3436961411473528367
 MonoBehaviour:
   m_ObjectHideFlags: 0

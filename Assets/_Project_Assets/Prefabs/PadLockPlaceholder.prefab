@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 8836959936630024202}
   - component: {fileID: 862847631436654019}
   - component: {fileID: 310840477687127036}
-  - component: {fileID: 4700687245773091878}
   - component: {fileID: 4631732741133595506}
   - component: {fileID: 5007956255681541185}
+  - component: {fileID: 4700687245773091878}
   m_Layer: 11
   m_Name: PadlockPlaceholder
   m_TagString: PadlockMarker
@@ -985,19 +985,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8933404996358485184}
   m_Mesh: {fileID: 0}
---- !u!114 &4700687245773091878
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8933404996358485184}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73b8796b94be4eb45a6cb13965663817, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isToggledOn: 0
 --- !u!65 &4631732741133595506
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1046,3 +1033,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &4700687245773091878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8933404996358485184}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73b8796b94be4eb45a6cb13965663817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isToggledOn: 0

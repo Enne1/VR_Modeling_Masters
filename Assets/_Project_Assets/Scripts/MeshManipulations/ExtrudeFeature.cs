@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
 
-public class ExtrudeFeature : MonoBehaviour
+public class ExtrudeFeature_V2 : MonoBehaviour
 {
     // Private variables needed for extrution
     private ObjSelector _objSelector;
@@ -15,20 +15,13 @@ public class ExtrudeFeature : MonoBehaviour
     private Vector3 _initialFaceCenter;
     private Vector3 _currControllerPos;
     
-    // Scripts
-    private WireframeWithVertices _wireframeScript;
-    private HandleUpdater _handleUpdater;
-    
     // Public variables
     public GameObject rightController;
-    public GameObject handlePrefab;
     public float minExtrudeDistance;
-
-    // Find other script instances in the scene
+    
     void Start()
     {
         _objSelector = FindFirstObjectByType<ObjSelector>();
-        _handleUpdater = FindFirstObjectByType<HandleUpdater>();
     }
     
     void Update()
@@ -37,14 +30,12 @@ public class ExtrudeFeature : MonoBehaviour
         if (_objSelector != null && _objSelector.ClosestObj != null)
         {
             _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
-            _wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
         }
 
         // Continuously update the shape when an extrution operation is happening
         if (_isDragging)
         {
             DragFace();
-            //_handleUpdater.HandleOnFace();
         }
     }
     
@@ -63,7 +54,6 @@ public class ExtrudeFeature : MonoBehaviour
     {
         _isDragging = false;
         _selectedFace = null;
-        _wireframeScript.updateWireframe = false;
     }
 
     // Function responsible for performing extrution
@@ -90,15 +80,14 @@ public class ExtrudeFeature : MonoBehaviour
         // Calculate displacement and apply to vertices
         Vector3 displacement = newFaceCenter - GetFaceCenter(_selectedFace);
         _pbMesh.TranslateVerticesInWorldSpace(_selectedFace.distinctIndexes.ToArray(), displacement);
-
+        
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }
     
     // Start extrution when right index trigger is pressed
-    public void RightIndexTriggerDown()
+    public void CallExtrution()
     {
-        _wireframeScript.updateWireframe = true;
         Face closestFace = GetClosestFace();
         if (closestFace != null)
         {
@@ -151,55 +140,8 @@ public class ExtrudeFeature : MonoBehaviour
     void ExtrudeFace(Face face)
     {
         List<Face> newFaces = new List<Face> { face };
-        _pbMesh.Extrude(newFaces, ExtrudeMethod.IndividualFaces, .1f);
+        _pbMesh.Extrude(newFaces, ExtrudeMethod.IndividualFaces, .01f);
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }
-
-    // !!!! MOVED TO NEW SCRIPT !!!!
-    /*
-    void HandleOnFace()
-    {
-        GameObject[] handles = GameObject.FindGameObjectsWithTag("FaceHandle");
-
-        foreach (GameObject handle in handles)
-        {
-            //Debug.Log("Destroying handle: " + handle.name);
-            Destroy(handle);
-        }
-
-        foreach (Face face in _pbMesh.faces)
-        {
-            Vector3 faceCenter = GetFaceCenter(face);
-
-            Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, face)); // Convert to world space
-
-            // Get a stable "up" direction using one of the edges
-            Edge firstEdge = face.edges[0]; // Assuming edges[0] exists
-            Vector3 edgeDirection = (_pbMesh.positions[firstEdge.a] - _pbMesh.positions[firstEdge.b]).normalized;
-            edgeDirection = _pbMesh.transform.TransformDirection(edgeDirection); // Convert to world space
-
-            // Ensure the up direction is perpendicular to the normal
-            Vector3 up = Vector3.Cross(faceNormal, edgeDirection).normalized;
-            Vector3 right = Vector3.Cross(up, faceNormal).normalized;
-
-            // Create a rotation matrix that aligns the handle correctly
-            Quaternion rotation = Quaternion.LookRotation(faceNormal, up);
-
-            GameObject handle = Instantiate(handlePrefab, faceCenter, rotation);
-            handle.transform.SetParent(_pbMesh.transform, true); // Attach handle to the mesh
-        }
-    }
-
-    public void ClearHandles()
-    {
-        GameObject[] handles = GameObject.FindGameObjectsWithTag("FaceHandle");
-
-        foreach (GameObject handle in handles)
-        {
-            //Debug.Log("Destroying handle: " + handle.name);
-            Destroy(handle);
-        }
-    }
-    */
 }

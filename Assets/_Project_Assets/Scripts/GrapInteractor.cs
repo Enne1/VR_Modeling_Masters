@@ -13,7 +13,7 @@ public class GrapInteractor : MonoBehaviour
     private Vector3 _initialScale;
     private Quaternion _relativeRotation;
 
-    private WireframeWithVertices _wireframeScript;
+    //private WireframeWithVertices _wireframeScript;
 
     public GameObject rightController;
     public GameObject leftController;
@@ -29,7 +29,7 @@ public class GrapInteractor : MonoBehaviour
         if (_objSelector != null && _objSelector.ClosestObj != null)
         {
             _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
-            _wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
+           // _wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
         }
         
         if (_isGrabbing && !_isScaling) FollowController();
@@ -47,7 +47,7 @@ public class GrapInteractor : MonoBehaviour
     {
         if (_pbMesh == null) return;
         
-        _wireframeScript.updateWireframe = true;
+       // _wireframeScript.updateWireframe = true;
 
         if (IsControllerNearObject(rightController.transform.position))
         {
@@ -59,7 +59,7 @@ public class GrapInteractor : MonoBehaviour
     
     public void DetachFromController()
     {
-        _wireframeScript.updateWireframe = false;
+        //_wireframeScript.updateWireframe = false;
         if (_pbMesh == null) return;
         _isGrabbing = false;
     }
