@@ -1,6 +1,8 @@
 # VR_Modeling_Masters
 
-This is the assets nedded for building a Unity project the VR modelling program.
+This is a basic VR box Modeling software developed at The Department of Applied Mathematics and Computer Science at the Technical University of Denmark as a masters project.
+The software is make using unity 6000 and is based on the ProBuilder runtime API for mesh manipulation operations.
+
 
 ## Set up in Unity
 - Download the project as a .zip file and extract the folder
