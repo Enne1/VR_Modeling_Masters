@@ -85,7 +85,7 @@ public class SelectionManager : MonoBehaviour
         {
             case "FaceHandle":
                 Debug.Log("Selected Handle: " + selectedObject.name);
-                selectedObject.GetComponent<MeshRenderer>().material = sMat;
+                //selectedObject.GetComponent<MeshRenderer>().material = sMat;
                 if (_rightTrigger)
                 {
                     Debug.Log("Should Start Extrution");
@@ -135,13 +135,13 @@ public class SelectionManager : MonoBehaviour
                     if (padlockToggler.isToggledOn)
                     {
                         padlockSelectedList.AddToPadlockList(selectedObject);
-                        selectedObject.GetComponent<MeshRenderer>().material = sMat;
+                        //selectedObject.GetComponent<MeshRenderer>().material = sMat;
                     }
                     else
                     {
                         // Remove the selected object from the list if it's there
                         padlockSelectedList.RemoveFromPadlockList(selectedObject);
-                        selectedObject.GetComponent<MeshRenderer>().material = dMat;
+                        //selectedObject.GetComponent<MeshRenderer>().material = dMat;
                     }
 
                     // Debugging: Print out the list of selected padlocks

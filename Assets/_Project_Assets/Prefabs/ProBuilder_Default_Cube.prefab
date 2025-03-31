@@ -410,7 +410,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spherePrefab: {fileID: 8941700895052496571, guid: dcaabcf7a2103ba4ab520105875ce4e9, type: 3}
   padlockPrefab: {fileID: 8933404996358485184, guid: 8abfb6b185c2fa049a21c8b851e655af, type: 3}
-  padlockOffset: 1
+  padlockOffset: 2
 --- !u!114 &3436961411473528367
 MonoBehaviour:
   m_ObjectHideFlags: 0

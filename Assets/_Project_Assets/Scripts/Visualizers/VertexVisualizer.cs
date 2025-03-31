@@ -15,7 +15,6 @@ public class VertexVisualizer : MonoBehaviour
 
     public GameObject spherePrefab;  // Reference to the small sphere prefab
     public GameObject padlockPrefab; // Reference to the padlock prefab
-    //public float sphereRadius = 0.02f;
     public float padlockOffset = 0.1f; // Distance to place the padlock outside the vertex
     
     void Start()
@@ -55,7 +54,7 @@ public class VertexVisualizer : MonoBehaviour
             }
         }
 
-        Vector3[] normals = _pbMesh.GetNormals(); // Get vertex normals
+        //Vector3[] normals = _pbMesh.GetNormals(); // Get vertex normals
 
         foreach (int vertexIndex in modifiedVertices)
         {
@@ -72,7 +71,6 @@ public class VertexVisualizer : MonoBehaviour
                 else
                 {
                     GameObject sphere = Instantiate(spherePrefab, vertexPosition, Quaternion.identity);
-                    //sphere.transform.localScale = Vector3.one * sphereRadius;
                     sphere.transform.SetParent(_pbMesh.transform, true);
                     _vertexSpheres[vertexIndex] = sphere;
                 }
@@ -84,26 +82,23 @@ public class VertexVisualizer : MonoBehaviour
             // Now handle the padlock as a child of the sphere
             if (_vertexSpheres.ContainsKey(vertexIndex))
             {
-                GameObject sphere = _vertexSpheres[vertexIndex];
-                //Vector3 padlockPosition = FindPadlockPosition(vertexPosition, normals[vertexIndex]);
-                Debug.Log("vertex Index: " + vertexIndex);
                 Vector3 padlockPosition = FindPadlockPosition(transform.InverseTransformPoint(vertexPosition), vertexIndex);
                 
-                //Debug.Log("World Space: " + vertexPosition);
-                //Debug.Log("Local Space: " + transform.InverseTransformPoint(vertexPosition));
                 // Create or update the padlock
+                /*
                 if (_vertexPadlocks.ContainsKey(vertexIndex))
                 {
-                    //_vertexPadlocks[vertexIndex].transform.position = padlockPosition;
+                    Debug.Log(padlockPosition);
+                    _vertexPadlocks[vertexIndex].transform.position = padlockPosition;
+                    //_vertexPadlocks[vertexIndex].transform.position = transform.InverseTransformPoint(padlockPosition);
+                    //_vertexPadlocks[vertexIndex].transform.position = transform.InverseTransformPoint(padlockPosition);
                 }
                 else
+                */
+                if(!_vertexPadlocks.ContainsKey(vertexIndex))
                 {
                     GameObject padlock = Instantiate(padlockPrefab, padlockPosition, Quaternion.identity);
-                    
-                    //padlock.transform.localScale = Vector3.one * sphereRadius;
-                    padlock.transform.SetParent(sphere.transform, false); // Set the sphere as the parent
-                    //padlock.transform.localRotation = Quaternion.identity;
-                    padlock.AddComponent<PadlockToggle>(); // Attach the toggle script
+                    padlock.transform.SetParent(_vertexSpheres[vertexIndex].transform, false);
                     _vertexPadlocks[vertexIndex] = padlock;
                     
                 }
@@ -118,9 +113,6 @@ public class VertexVisualizer : MonoBehaviour
         Vector3 optimalDirection = GetFurthestDirection(vertexIndex);
         Vector3 worldVertexPosition = transform.TransformPoint(vertexPosition);
         Vector3 worldPadlockPosition = worldVertexPosition + optimalDirection * -padlockOffset;
-
-        //Debug.DrawLine(worldVertexPosition, worldPadlockPosition, Color.blue, 5f);
-
         return transform.InverseTransformPoint(worldPadlockPosition);
     }
 
@@ -169,34 +161,11 @@ public class VertexVisualizer : MonoBehaviour
                 Vector3 worldNormal = _pbMesh.transform.TransformDirection(localNormal); // Convert to world space
             
                 normals.Add(worldNormal);
-
-                // Debug visualization
-                Vector3 faceCenter = GetFaceCenter(face);
-                //Debug.DrawLine(faceCenter, faceCenter + worldNormal * 0.2f, Color.green, 5f);
             }
         }
 
         return normals;
     }
-
-
-
-
-
-    Vector3 GetFaceCenter(Face face)
-    {
-        Vector3 sum = Vector3.zero;
-        int count = face.indexes.Count;
-            
-        foreach (int index in face.indexes)
-        {
-            sum += _pbMesh.transform.TransformPoint(_pbMesh.positions[index]); // Convert local space to world space
-        }
-        
-        return sum / count;
-    }
-
-
     
     List<int> GetModifiedVertices()
     {
@@ -211,8 +180,9 @@ public class VertexVisualizer : MonoBehaviour
         }
         return modifiedVertices;
     }
-}
 
+}
+/*
 public class PadlockToggle : MonoBehaviour
 {
     private bool isLocked = false;
@@ -222,3 +192,4 @@ public class PadlockToggle : MonoBehaviour
         GetComponent<Renderer>().material.color = isLocked ? Color.red : Color.green;
     }
 }
+*/
