@@ -18,8 +18,9 @@ GameObject:
   - component: {fileID: 3802489143655378787}
   - component: {fileID: 3462377314128753129}
   - component: {fileID: 3436961411473528367}
+  - component: {fileID: 5098990973183449026}
   m_Layer: 6
-  m_Name: ProBuilder_Default_Cube
+  m_Name: MeshManipulationCube
   m_TagString: ProBuilderObj
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -424,3 +425,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedPadlocks: []
+--- !u!114 &5098990973183449026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4912339518013422798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e4ca33caf94952442885dd6d7ffa91c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wireColor: {r: 0, g: 0, b: 0, a: 1}

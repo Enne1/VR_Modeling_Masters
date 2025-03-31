@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 2214131353317426445}
   - component: {fileID: 3815591011419192758}
   - component: {fileID: 7553833238607041336}
-  m_Layer: 11
-  m_Name: VertexMarkerPrefab
+  m_Layer: 7
+  m_Name: ObjVertexMarker
   m_TagString: VertexMarker
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

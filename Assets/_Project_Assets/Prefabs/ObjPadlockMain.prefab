@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 4631732741133595506}
   - component: {fileID: 5007956255681541185}
   - component: {fileID: 4700687245773091878}
-  m_Layer: 11
-  m_Name: Padlock
+  m_Layer: 7
+  m_Name: ObjPadlockMain
   m_TagString: PadlockMarker
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
