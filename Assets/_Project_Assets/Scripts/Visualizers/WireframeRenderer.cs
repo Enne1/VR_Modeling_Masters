@@ -1,81 +1,112 @@
 using UnityEngine;
 using UnityEngine.ProBuilder;
-using UnityEngine.ProBuilder.MeshOperations;
 using System.Collections.Generic;
+using System.Linq;
 
 [RequireComponent(typeof(ProBuilderMesh))]
-public class ProBuilderWireframe : MonoBehaviour
+[RequireComponent(typeof(LineRenderer))]
+public class WireframeRenderer : MonoBehaviour
 {
-    public Color wireColor = Color.green; // Wireframe color
+    public Color wireColor = Color.green;
+    public float lineWidth = 0.005f;
+    public Material wireframeMaterial;
+
     private ProBuilderMesh pbMesh;
-    private HashSet<Edge> quadEdges = new HashSet<Edge>();
-    private int lastVertexCount = 0; // Track mesh changes
+    private LineRenderer lineRenderer;
+    private Vector3[] lastVertexPositions;
 
     private void Start()
     {
         pbMesh = GetComponent<ProBuilderMesh>();
-        UpdateWireframe(); // Initial setup
+        lineRenderer = GetComponent<LineRenderer>();
+
+        // Set LineRenderer properties
+        lineRenderer.startWidth = lineWidth;
+        lineRenderer.endWidth = lineWidth;
+        lineRenderer.useWorldSpace = true;
+        lineRenderer.loop = false;
+
+        // Assign material
+        if (wireframeMaterial != null)
+            lineRenderer.material = wireframeMaterial;
+        else
+            Debug.LogError("Wireframe material is missing! Assign it in the Inspector.");
+
+        StoreVertexPositions();
+        UpdateWireframe();
     }
 
-    private void Update()
+    private void LateUpdate()
     {
-        // Check if the mesh has changed
-        if (pbMesh.vertexCount != lastVertexCount)
+        if (HasMeshChanged() || transform.hasChanged)
         {
             UpdateWireframe();
-            lastVertexCount = pbMesh.vertexCount;
+            transform.hasChanged = false;
         }
     }
 
-    private void OnRenderObject()
+    private void StoreVertexPositions()
     {
-        if (quadEdges.Count == 0) return;
+        lastVertexPositions = pbMesh.positions.ToArray();
+    }
 
-        // Use GL to render the edges
-        Material lineMaterial = new Material(Shader.Find("Hidden/Internal-Colored"));
-        lineMaterial.SetPass(0);
-        GL.Begin(GL.LINES);
-        GL.Color(wireColor);
+    private bool HasMeshChanged()
+    {
+        if (pbMesh.vertexCount != lastVertexPositions.Length)
+            return true;
 
-        foreach (Edge edge in quadEdges)
+        for (int i = 0; i < pbMesh.positions.Count; i++)
         {
-            DrawEdge(pbMesh.positions[edge.a], pbMesh.positions[edge.b]);
+            if (pbMesh.positions[i] != lastVertexPositions[i])
+                return true;
         }
 
-        GL.End();
+        return false;
     }
 
     private void UpdateWireframe()
     {
-        quadEdges.Clear(); // Clear previous edges
+        List<Vector3> wireframePoints = new List<Vector3>();
         Dictionary<Edge, int> edgeCount = new Dictionary<Edge, int>();
-
-        foreach (Face face in pbMesh.faces)
-        {
-            if (face.edges.Count == 4) // Ensure the face is a quad
-            {
-                foreach (Edge edge in face.edges)
-                {
-                    edgeCount.TryGetValue(edge, out int count);
-                    edgeCount[edge] = count + 1;
-                }
-            }
-        }
-
-        // Only add edges that are part of quads
-        foreach (var kvp in edgeCount)
-        {
-            if (kvp.Value == 1) // Unique edges (not internal)
-                quadEdges.Add(kvp.Key);
-        }
 
         pbMesh.ToMesh();
         pbMesh.Refresh();
-    }
 
-    private void DrawEdge(Vector3 v0, Vector3 v1)
-    {
-        GL.Vertex(transform.TransformPoint(v0));
-        GL.Vertex(transform.TransformPoint(v1));
+        // First, count how many times each edge appears across all faces
+        foreach (Face face in pbMesh.faces)
+        {
+            foreach (Edge edge in face.edges)
+            {
+                edgeCount.TryGetValue(edge, out int count);
+                edgeCount[edge] = count + 1;
+            }
+        }
+
+        // Now we will filter out internal edges, keeping only those that are shared by one face.
+        List<Edge> outerEdges = new List<Edge>();
+        foreach (var kvp in edgeCount)
+        {
+            if (kvp.Value == 1) // Only include edges that appear once (i.e., outer edges)
+            {
+                outerEdges.Add(kvp.Key);
+            }
+        }
+
+        // Add these outer edges to the wireframe points
+        foreach (Edge edge in outerEdges)
+        {
+            // Transform the edge vertices into world space
+            Vector3 startVertex = transform.TransformPoint(pbMesh.positions[edge.a]);
+            Vector3 endVertex = transform.TransformPoint(pbMesh.positions[edge.b]);
+
+            wireframePoints.Add(startVertex);
+            wireframePoints.Add(endVertex);
+        }
+
+        // Update LineRenderer with the outer edges
+        lineRenderer.positionCount = wireframePoints.Count;
+        lineRenderer.SetPositions(wireframePoints.ToArray());
+
+        StoreVertexPositions();
     }
 }

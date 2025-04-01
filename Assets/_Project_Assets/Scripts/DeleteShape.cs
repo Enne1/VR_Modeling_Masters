@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class DeleteShape : MonoBehaviour
 {
@@ -7,7 +8,8 @@ public class DeleteShape : MonoBehaviour
     public LayerMask detectionLayer; 
     private Material originalMat;
     public Material deleteMat;
-    
+    public Material selectedMat;
+    private HashSet<Collider> objectsInsideTrigger = new HashSet<Collider>();  // Track objects in the trigger
     //private bool isObjectInside = false;  // A boolean to keep track of whether an object is inside the collider
     
     // Code Run whenever an object it released from being grabbed
@@ -19,9 +21,11 @@ public class DeleteShape : MonoBehaviour
         // Delete all objects within the trashcan objects
         foreach (Collider obj in objectsToDelete)
         {
+            objectsInsideTrigger.Remove(obj);
             Destroy(obj.gameObject);
         }
     }
+   
 
     // Called when another collider enters the trigger collider
     private void OnTriggerEnter(Collider other)
@@ -29,9 +33,9 @@ public class DeleteShape : MonoBehaviour
         // Check if the object that entered the trigger is on the specified layer mask
         if ((detectionLayer.value & (1 << other.gameObject.layer)) != 0)
         {
-            originalMat = other.gameObject.GetComponent<MeshRenderer>().material;
-            //isObjectInside = true;  // Set the boolean to true when an object enters
+            // Change material to 'deleteMat' when entering
             other.gameObject.GetComponent<MeshRenderer>().material = deleteMat;
+            objectsInsideTrigger.Add(other);  // Add to the list of objects inside
         }
     }
 
@@ -41,8 +45,27 @@ public class DeleteShape : MonoBehaviour
         // Check if the object that exited the trigger is on the specified layer mask
         if ((detectionLayer.value & (1 << other.gameObject.layer)) != 0)
         {
-            //isObjectInside = false;  // Set the boolean to false when an object leaves
-            other.gameObject.GetComponent<MeshRenderer>().material = originalMat;
+            // Only reset the material if it was previously inside the trigger
+            if (objectsInsideTrigger.Contains(other))
+            {
+                other.gameObject.GetComponent<MeshRenderer>().material = selectedMat;
+                objectsInsideTrigger.Remove(other);  // Remove from the list of objects inside
+            }
+        }
+    }
+
+    // Optional: This method is here just in case you want to handle things manually
+    // for objects that scale down and don't trigger the OnTriggerExit properly.
+    private void Update()
+    {
+        // Check for all objects currently inside the trigger and make sure they are still within bounds.
+        foreach (var obj in objectsInsideTrigger)
+        {
+            if (!GetComponent<Collider>().bounds.Intersects(obj.bounds))
+            {
+                obj.gameObject.GetComponent<MeshRenderer>().material = selectedMat;
+                objectsInsideTrigger.Remove(obj);
+            }
         }
     }
 }

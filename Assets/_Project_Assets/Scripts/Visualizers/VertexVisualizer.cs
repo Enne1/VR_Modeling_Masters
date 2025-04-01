@@ -53,9 +53,7 @@ public class VertexVisualizer : MonoBehaviour
                 modifiedVertices.Add(i);
             }
         }
-
-        //Vector3[] normals = _pbMesh.GetNormals(); // Get vertex normals
-
+        
         foreach (int vertexIndex in modifiedVertices)
         {
             Vector3 vertexPosition = _pbMesh.transform.TransformPoint(_pbMesh.positions[vertexIndex]);
@@ -84,26 +82,13 @@ public class VertexVisualizer : MonoBehaviour
             {
                 Vector3 padlockPosition = FindPadlockPosition(transform.InverseTransformPoint(vertexPosition), vertexIndex);
                 
-                // Create or update the padlock
-                /*
-                if (_vertexPadlocks.ContainsKey(vertexIndex))
-                {
-                    Debug.Log(padlockPosition);
-                    _vertexPadlocks[vertexIndex].transform.position = padlockPosition;
-                    //_vertexPadlocks[vertexIndex].transform.position = transform.InverseTransformPoint(padlockPosition);
-                    //_vertexPadlocks[vertexIndex].transform.position = transform.InverseTransformPoint(padlockPosition);
-                }
-                else
-                */
                 if(!_vertexPadlocks.ContainsKey(vertexIndex))
                 {
                     GameObject padlock = Instantiate(padlockPrefab, padlockPosition, Quaternion.identity);
                     padlock.transform.SetParent(_vertexSpheres[vertexIndex].transform, false);
                     _vertexPadlocks[vertexIndex] = padlock;
-                    
                 }
             }
-
             _lastVertexPositions[vertexIndex] = vertexPosition;
         }
     }
@@ -112,10 +97,11 @@ public class VertexVisualizer : MonoBehaviour
     {
         Vector3 optimalDirection = GetFurthestDirection(vertexIndex);
         Vector3 worldVertexPosition = transform.TransformPoint(vertexPosition);
-        Vector3 worldPadlockPosition = worldVertexPosition + optimalDirection * -padlockOffset;
-        return transform.InverseTransformPoint(worldPadlockPosition);
+        // Vector3 worldPadlockPosition = (worldVertexPosition + optimalDirection) * padlockOffset;
+        // return transform.InverseTransformPoint(worldPadlockPosition);
+        Vector3 worldPadlockPosition = (vertexPosition + optimalDirection) * -padlockOffset;
+        return worldPadlockPosition;
     }
-
 
     Vector3 GetFurthestDirection(int vertexIndex)
     {
@@ -163,7 +149,6 @@ public class VertexVisualizer : MonoBehaviour
                 normals.Add(worldNormal);
             }
         }
-
         return normals;
     }
     
@@ -182,14 +167,3 @@ public class VertexVisualizer : MonoBehaviour
     }
 
 }
-/*
-public class PadlockToggle : MonoBehaviour
-{
-    private bool isLocked = false;
-    public void ToggleLock()
-    {
-        isLocked = !isLocked;
-        GetComponent<Renderer>().material.color = isLocked ? Color.red : Color.green;
-    }
-}
-*/

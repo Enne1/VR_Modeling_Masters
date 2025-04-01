@@ -19,7 +19,5 @@ public class VertexLocker : MonoBehaviour
         
         _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
         if (_pbMesh == null) return;
-        
-        
     }
 }

@@ -7699,7 +7699,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c22777d6e868e4f2fb421913386b154e, type: 2}
+  - {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13492,7 +13492,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1064920362
 Transform:
   m_ObjectHideFlags: 0
@@ -13524,10 +13524,10 @@ MonoBehaviour:
   rightController: {fileID: 29748420}
   scalableLayer:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 128
   minDistance: 0.075
   maxDistance: 0.2
-  startScale: 0.01
+  startScale: 1
 --- !u!1 &1070976890
 GameObject:
   m_ObjectHideFlags: 0
@@ -23401,7 +23401,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c22777d6e868e4f2fb421913386b154e, type: 2}
+  - {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -26362,7 +26362,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2007188180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26997,6 +26997,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   proximityScalerManager: {fileID: 1064920361}
+  selectionRadius: 1
+  selectionMask:
+    serializedVersion: 2
+    m_Bits: 64
   deselectedMat: {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
   selectedMat: {fileID: 2100000, guid: 238906dd8082cc5418dc3021a9456f5b, type: 2}
   leftController: {fileID: 1699961308}
@@ -27033,7 +27037,7 @@ MonoBehaviour:
   maxSelectionDistance: 0.1
   selectionMask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 128
   extrudeManager: {fileID: 1283808456}
   dragManager: {fileID: 1483968726}
   vertexDragManager: {fileID: 1631216594}
@@ -27119,6 +27123,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   deleteMat: {fileID: 2100000, guid: 435138cdb6602a0449e0473b1a37b34d, type: 2}
+  selectedMat: {fileID: 2100000, guid: 238906dd8082cc5418dc3021a9456f5b, type: 2}
 --- !u!135 &2053526367
 SphereCollider:
   m_ObjectHideFlags: 0

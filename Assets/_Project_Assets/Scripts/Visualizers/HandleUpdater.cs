@@ -150,7 +150,4 @@ public class HandleUpdater : MonoBehaviour
 
         return bestEdge;
     }
-
-
-
 }

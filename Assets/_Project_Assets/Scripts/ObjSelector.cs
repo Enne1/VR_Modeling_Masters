@@ -11,6 +11,9 @@ public class ObjSelector : MonoBehaviour
     private HandleUpdater _handleUpdater;
     
     public GameObject proximityScalerManager;
+    
+    public float selectionRadius;
+    public LayerMask selectionMask;
     private ProximityScaler _proximityScaler;
     
     
@@ -23,15 +26,7 @@ public class ObjSelector : MonoBehaviour
     // Find and select the closest object to the controller when "A" is pressed
     public void SelectObj()
     {
-        //_handleUpdater = FindFirstObjectByType<HandleUpdater>();
-        
-        //_handleUpdater.ClearHandles();
         _pbObjectsInScene = GameObject.FindGameObjectsWithTag("ProBuilderObj"); // Find all objects with the tag
-        
-        float distToController = float.MaxValue;
-        float maxDist = 1f;
-        ClosestObj = null;
-
         foreach (GameObject pb in _pbObjectsInScene)
         {
             // Set all objects to the deselected material
@@ -45,16 +40,33 @@ public class ObjSelector : MonoBehaviour
             {
                 child.gameObject.SetActive(false);
             }
+        }
+        
+        Collider[] hits = Physics.OverlapSphere(
+            leftController.transform.position, selectionRadius, selectionMask
+        );
 
-            // Find the closest object
-            float distance = Vector3.Distance(pb.transform.position, leftController.transform.position);
-            if (distance < distToController && distance < maxDist)
+        ClosestObj = null;
+        float closestDistance = selectionRadius;
+
+        foreach (Collider hit in hits)
+        {
+            // Find the closest point on the collider's surface
+            Vector3 closestPoint = hit.ClosestPoint(leftController.transform.position);
+
+            // Measure the distance from the controller to the closest point on the collider
+            float distance = Vector3.Distance(leftController.transform.position, closestPoint);
+
+            if (distance < closestDistance)
             {
-                distToController = distance;
-                ClosestObj = pb;
+                Debug.Log("New closest object: " + hit.name);
+                Debug.Log("Distance: " + distance);
+                closestDistance = distance;
+                ClosestObj = hit.transform.gameObject;
             }
         }
-        //_handleUpdater.HandleOnFace();
+
+        
         _proximityScaler = proximityScalerManager.GetComponent<ProximityScaler>();
         _proximityScaler.SetScales(ClosestObj);
         

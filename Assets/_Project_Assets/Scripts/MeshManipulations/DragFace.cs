@@ -112,7 +112,7 @@ public class DragFace_V2 : MonoBehaviour
     
         // Threshold for snapping (If the controller is moved away from the face normal,
         // The face can be dragged around freely, otherwise it is snapped to normal vector)
-        float snapThreshold = 0.025f; // Adjust this value for sensitivity
+        float snapThreshold = 0.05f; // Adjust this value for sensitivity
         float deviation = (movementDelta - constrainedMovement).magnitude;
     
         Vector3 finalMovement;
