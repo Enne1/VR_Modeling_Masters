@@ -45,7 +45,7 @@ public class DragVertex : MonoBehaviour
         _selectedVertexIndices.Clear();
         _initialVertexPositions.Clear();
 
-        PadlockSelectedList padlockSelectedList = _pbMesh.transform.GetComponent<PadlockSelectedList>();
+        MultiSelectedList padlockSelectedList = _pbMesh.transform.GetComponent<MultiSelectedList>();
         if (padlockSelectedList.selectedPadlocks != null)
         {
             foreach (var padlock in padlockSelectedList.selectedPadlocks)

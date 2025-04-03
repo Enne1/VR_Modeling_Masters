@@ -22,9 +22,6 @@ public class SelectionManager : MonoBehaviour
     public GameObject vertexDragManager;
     private DragVertex _vertexDragScript;
     
-    //public GameObject lockManager;
-    //private VertexLocker _lockVertexScript;
-    
     [Header("Testing Material")]
     public Material sMat;
     public Material dMat;
@@ -117,31 +114,23 @@ public class SelectionManager : MonoBehaviour
 
             case "PadlockMarker":
                 Debug.Log("Selected Padlock: " + selectedObject.name);
-    
-                // Ensure list is initialized
-                //if (_selectedPadlocks == null)
-                //{
-                //    _selectedPadlocks = new List<GameObject>();
-                //}
-
+   
                 // Check if the PadlockToggler component is attached
-                PadlockToggler padlockToggler = selectedObject.GetComponent<PadlockToggler>();
-                PadlockSelectedList padlockSelectedList = selectedObject.transform.parent.parent.GetComponent<PadlockSelectedList>();
+                MultiSelectionToggler padlockToggler = selectedObject.GetComponent<MultiSelectionToggler>();
+                MultiSelectedList padlockSelectedList = selectedObject.transform.parent.parent.GetComponent<MultiSelectedList>();
                 if (padlockToggler != null)
                 {
-                    padlockToggler.SwitchToggle();
+                    padlockToggler.SwitchTogglePadlock();
                     Debug.Log("Padlock lock state: " + padlockToggler.isToggledOn);
         
                     if (padlockToggler.isToggledOn)
                     {
                         padlockSelectedList.AddToPadlockList(selectedObject);
-                        //selectedObject.GetComponent<MeshRenderer>().material = sMat;
                     }
                     else
                     {
                         // Remove the selected object from the list if it's there
                         padlockSelectedList.RemoveFromPadlockList(selectedObject);
-                        //selectedObject.GetComponent<MeshRenderer>().material = dMat;
                     }
 
                     // Debugging: Print out the list of selected padlocks
@@ -151,6 +140,36 @@ public class SelectionManager : MonoBehaviour
                 else 
                 {
                     Debug.LogWarning("PadlockToggle component not found on selectedObject.");
+                }
+                break;
+            case "FaceLocker":
+                Debug.Log("Selected Face: " + selectedObject.name);
+   
+                // Check if the fac lockToggler component is attached
+                MultiSelectionToggler faceLockToggler = selectedObject.GetComponent<MultiSelectionToggler>();
+                MultiSelectedList facesSelectedList = selectedObject.transform.parent.parent.GetComponent<MultiSelectedList>();
+                if (faceLockToggler != null)
+                {
+                    faceLockToggler.SwitchToggleFacelock();
+                    Debug.Log("face lock state: " + faceLockToggler.isToggledOn);
+        
+                    if (faceLockToggler.isToggledOn)
+                    {
+                        facesSelectedList.AddToFacesList(selectedObject);
+                    }
+                    else
+                    {
+                        // Remove the selected object from the list if it's there
+                        facesSelectedList.RemoveFromFacesList(selectedObject);
+                    }
+
+                    // Debugging: Print out the list of selected padlocks
+                    Debug.Log("Number of Selected faces: " + facesSelectedList.selectedFaces.Count);
+                    Debug.Log("List of Selected faces: " + string.Join(", ", facesSelectedList.selectedFaces.ConvertAll(padlock => padlock.name).ToArray()));
+                }
+                else 
+                {
+                    Debug.LogWarning("FaceToggle component not found on selectedObject.");
                 }
                 break;
         }
@@ -174,6 +193,8 @@ public class SelectionManager : MonoBehaviour
                 _vertexDragScript.StopDraggingVertex();
                 break;
             case "PadlockMarker":
+                break;
+            case "FaceLocker":
                 break;
             default:
                 Debug.Log("Unknown Tag: " + _currentSelection);

@@ -14,6 +14,7 @@ public class HandleUpdater : MonoBehaviour
 
 
     public GameObject handlePrefab;
+    public GameObject placeholderSignifier;
     //public float handleSize = 0.02f;
 
     void Start()
@@ -87,6 +88,7 @@ public class HandleUpdater : MonoBehaviour
             {
                 GameObject handle = Instantiate(handlePrefab, faceCenter, faceRotation);
                 handle.transform.SetParent(_pbMesh.transform, true);
+                //LockSignifier(handle);
                 _faceHandles[face] = handle;
             }
 
@@ -95,7 +97,14 @@ public class HandleUpdater : MonoBehaviour
         }
     }
 
-
+    void LockSignifier(GameObject handle)
+    {
+        // Offset
+        // 0.05, 0, 0.02
+        GameObject signifer = Instantiate(placeholderSignifier, handle.transform.position + new Vector3(0.05f, 0, 0.02f), Quaternion.identity);
+        signifer.transform.SetParent(handle.transform, false);
+        
+    }
 
 
     Vector3 GetFaceCenter(Face face)

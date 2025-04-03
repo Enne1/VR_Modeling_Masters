@@ -6463,7 +6463,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 457578106}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b9521224e883fd43b7a4ade8f93812a, type: 3}
   m_Name: 
@@ -22125,7 +22125,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1726093735
 Transform:
   m_ObjectHideFlags: 0
@@ -27143,7 +27143,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.008235325
+  m_Radius: 0.008
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2065031092
 GameObject:

@@ -71,6 +71,9 @@ public class DragFace_V2 : MonoBehaviour
         
         _initialControllerPos = leftController.transform.position;
         _initialFaceCenter = GetFaceCenter(_selectedFace);
+        
+        
+        
         _isDragging = true;
         
         Vector3 localNormal = Math.Normal(_pbMesh, _selectedFace);

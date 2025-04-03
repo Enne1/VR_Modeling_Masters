@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 9106530152179418016}
   - component: {fileID: 4631732741133595506}
   - component: {fileID: 5007956255681541185}
-  - component: {fileID: 4700687245773091878}
+  - component: {fileID: 5705752766828508126}
   m_Layer: 7
   m_Name: ObjPadlockMainSized
   m_TagString: PadlockMarker
@@ -84,7 +84,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4700687245773091878
+--- !u!114 &5705752766828508126
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,8 +97,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isToggledOn: 0
-  padlockToggleLocked: {fileID: 2408064166395735820}
-  padlockToggleUnlocked: {fileID: 7552144757102133292}
+  selectionToggleLocked: {fileID: 2408064166395735820}
+  selctionToggleUnlocked: {fileID: 7552144757102133292}
 --- !u!1001 &5758708285026156552
 PrefabInstance:
   m_ObjectHideFlags: 0
