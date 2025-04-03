@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/_Project_Assets/Scenes/Testing_ProBuilder.unity
     guid: 550109a5510da45468aa4706f586615e
+  - enabled: 0
+    path: Assets/_Project_Assets/temp/New Scene.unity
+    guid: c0841a41c8d62f14182b99395287f5eb
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 66bcf4c66e03cd14ba3eac5a36d440ea, type: 2}

@@ -4,46 +4,47 @@ using UnityEngine;
  using System.Collections.Generic;
  
  [RequireComponent(typeof(ProBuilderMesh))]
- public class WireframeRenderer : MonoBehaviour
+ public class rend : MonoBehaviour
  {
      public Color wireColor = Color.green; // Wireframe color
      private ProBuilderMesh pbMesh;
      private HashSet<Edge> quadEdges = new HashSet<Edge>();
      private int lastVertexCount = 0; // Track mesh changes
      public Material WireframeMaterial;
-
+ 
      private void Start()
      {
          pbMesh = GetComponent<ProBuilderMesh>();
          UpdateWireframe(); // Initial setup
      }
-
-    private void Update()
-    {
-        // Check if the mesh has changede
-        if (pbMesh.vertexCount != lastVertexCount)
-        {
-            UpdateWireframe();
-            lastVertexCount = pbMesh.vertexCount;
-        }
-    }
-    
-    private void OnRenderObject()
-    {
-        if (quadEdges.Count == 0) return;
-
-        WireframeMaterial.SetPass(0);
-        GL.Begin(GL.LINES);
-        GL.Color(wireColor);
-
-        foreach (Edge edge in quadEdges)
-        {
-            DrawEdge(pbMesh.positions[edge.a], pbMesh.positions[edge.b]);
-        }
-
-        GL.End(); 
-    }
-
+ 
+     private void Update()
+     {
+         // Check if the mesh has changede
+         if (pbMesh.vertexCount != lastVertexCount)
+         {
+             UpdateWireframe();
+             lastVertexCount = pbMesh.vertexCount;
+         }
+     }
+ 
+     private void OnRenderObject()
+     {
+         if (quadEdges.Count == 0) return;
+ 
+         // Use GL to render the edges
+         //Material lineMaterial = WireframeMaterial;//new Material(Shader.Find("Hidden/Internal-Colored"));
+         WireframeMaterial.SetPass(0);//lineMaterial.SetPass(0);
+         GL.Begin(GL.LINES);
+         GL.Color(wireColor);
+ 
+         foreach (Edge edge in quadEdges)
+         {
+             DrawEdge(pbMesh.positions[edge.a], pbMesh.positions[edge.b]);
+         }
+ 
+         GL.End();
+     }
  
      private void UpdateWireframe()
      {
@@ -72,7 +73,6 @@ using UnityEngine;
          pbMesh.ToMesh();
          pbMesh.Refresh();
      }
-     
  
      private void DrawEdge(Vector3 v0, Vector3 v1)
      {
