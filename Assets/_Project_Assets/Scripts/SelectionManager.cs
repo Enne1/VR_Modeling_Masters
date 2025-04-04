@@ -17,7 +17,7 @@ public class SelectionManager : MonoBehaviour
     private ExtrudeFeature_V2 _extrudeScript;
     
     public GameObject dragManager;
-    private DragFace_V2 _dragScript;
+    private DragFace _dragScript;
     
     public GameObject vertexDragManager;
     private DragVertex _vertexDragScript;
@@ -92,7 +92,7 @@ public class SelectionManager : MonoBehaviour
                 else
                 {
                     Debug.Log("Should Start Dragging");
-                    _dragScript = dragManager.GetComponent<DragFace_V2>();
+                    _dragScript = dragManager.GetComponent<DragFace>();
                     _dragScript.StartDraggingFace();
                 }
                 break;
