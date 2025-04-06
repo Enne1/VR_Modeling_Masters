@@ -397,6 +397,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handlePrefab: {fileID: 9096372030887335246, guid: 1ce44d2c4eedd4145ab20a99232a580d, type: 3}
+  placeholderSignifier: {fileID: 0}
 --- !u!114 &3462377314128753129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -425,6 +426,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedPadlocks: []
+  selectedFaces: []
 --- !u!114 &5098990973183449026
 MonoBehaviour:
   m_ObjectHideFlags: 0

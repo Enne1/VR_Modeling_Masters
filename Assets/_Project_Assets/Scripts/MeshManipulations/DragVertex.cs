@@ -41,6 +41,9 @@ public class DragVertex : MonoBehaviour
         _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
         if (_pbMesh == null) return;
 
+        //Store current mesh state in undo Stack
+        _pbMesh.GetComponent<UndoTracker>()?.SaveState();
+        
         // Get list of vertices to move
         _selectedVertexIndices.Clear();
         _initialVertexPositions.Clear();

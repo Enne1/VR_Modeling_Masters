@@ -48,6 +48,9 @@ public class DragFace : MonoBehaviour
     
     public void StartDraggingFace()
     {
+        //Store current mesh state in undo Stack
+        _pbMesh.GetComponent<UndoTracker>()?.SaveState();
+        
         _selectedFace = GetClosestFace(leftController.transform);
         if (_selectedFace == null) return;
         

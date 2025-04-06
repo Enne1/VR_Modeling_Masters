@@ -22,10 +22,8 @@ public class SelectionManager : MonoBehaviour
     public GameObject vertexDragManager;
     private DragVertex _vertexDragScript;
     
-    [Header("Testing Material")]
-    public Material sMat;
-    public Material dMat;
-
+    public GameObject mergeManager;
+    private MergeFaces _mergeScript;
     
     //Private variables
     private string _currentSelection;
@@ -183,10 +181,16 @@ public class SelectionManager : MonoBehaviour
                 if (_rightTrigger)
                 {
                     _extrudeScript.StopDraggingFace();
+                    
+                    _mergeScript = mergeManager.GetComponent<MergeFaces>();
+                    _mergeScript.MergeCloseFaces();
                 }
                 else
                 {
                     _dragScript.StopDraggingFace();
+                    
+                    _mergeScript = mergeManager.GetComponent<MergeFaces>();
+                    _mergeScript.MergeCloseFaces();
                 }
                 break;
             case "VertexMarker":

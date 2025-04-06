@@ -171,6 +171,9 @@ public class ExtrudeFeature_V2 : MonoBehaviour
         
         if (facesToExtrude.Count > 0)
         {
+            //Store current mesh state in undo Stack
+            _pbMesh.GetComponent<UndoTracker>()?.SaveState();
+            
             // Extrude all the selected faces simultaneously by a small initial amount.
             _pbMesh.Extrude(facesToExtrude, ExtrudeMethod.IndividualFaces, .01f);
             _pbMesh.ToMesh();
