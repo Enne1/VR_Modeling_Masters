@@ -25,7 +25,6 @@ public class MakeUndoCall : MonoBehaviour
 
     public void MakeUndo()
     {
-        Debug.Log("making undo");
         _proximityScaler.ResetScales();
         _pbMesh.GetComponent<UndoTracker>()?.Undo();
     }

@@ -14,7 +14,7 @@ public class SelectionManager : MonoBehaviour
     
     [Header("Managers")]
     public GameObject extrudeManager;
-    private ExtrudeFeature_V2 _extrudeScript;
+    private ExtrudeFeature _extrudeScript;
     
     public GameObject dragManager;
     private DragFace _dragScript;
@@ -41,7 +41,6 @@ public class SelectionManager : MonoBehaviour
             controller.position, selectionRadius, selectionMask
         );
     
-        Debug.Log("Hits Found: " + hits.Length);
         GameObject closestObject = null;
         string closestName = "";
         float closestDistance = maxSelectionDistance;
@@ -52,8 +51,6 @@ public class SelectionManager : MonoBehaviour
 
             if (distance < closestDistance)
             {
-                Debug.Log("New closest object: " + hit.name);
-                Debug.Log("Distance: " + distance);
                 closestDistance = distance;
                 closestObject = hit.transform.gameObject;
                 closestName = hit.name;
@@ -61,43 +58,33 @@ public class SelectionManager : MonoBehaviour
             }
         }
         
-        Debug.Log("Actual closest object: " + closestName);
-        
         if (closestObject != null)
         {
-            Debug.Log("Selected object: " + closestName);
             HandleSelection(closestObject);
         }
     }
 
     private void HandleSelection(GameObject selectedObject)
     {
-        Debug.Log("Selected Object Tag: " + selectedObject.tag);
-        
         _currentSelection = selectedObject.tag;
         
         switch (selectedObject.tag)
         {
             case "FaceHandle":
-                Debug.Log("Selected Handle: " + selectedObject.name);
                 //selectedObject.GetComponent<MeshRenderer>().material = sMat;
                 if (_rightTrigger)
                 {
-                    Debug.Log("Should Start Extrution");
-                    _extrudeScript = extrudeManager.GetComponent<ExtrudeFeature_V2>();
+                    _extrudeScript = extrudeManager.GetComponent<ExtrudeFeature>();
                     _extrudeScript.CallExtrution();
                 }
                 else
                 {
-                    Debug.Log("Should Start Dragging");
                     _dragScript = dragManager.GetComponent<DragFace>();
                     _dragScript.StartDraggingFace();
                 }
                 break;
 
             case "VertexMarker":
-                Debug.Log("Selected Vertex: " + selectedObject.name);
-                
                 if (_rightTrigger)
                 {
                     _vertexDragScript = vertexDragManager.GetComponent<DragVertex>();
@@ -111,16 +98,13 @@ public class SelectionManager : MonoBehaviour
                 break;
 
             case "PadlockMarker":
-                Debug.Log("Selected Padlock: " + selectedObject.name);
-   
                 // Check if the PadlockToggler component is attached
                 MultiSelectionToggler padlockToggler = selectedObject.GetComponent<MultiSelectionToggler>();
                 MultiSelectedList padlockSelectedList = selectedObject.transform.parent.parent.GetComponent<MultiSelectedList>();
                 if (padlockToggler != null)
                 {
                     padlockToggler.SwitchTogglePadlock();
-                    Debug.Log("Padlock lock state: " + padlockToggler.isToggledOn);
-        
+                    
                     if (padlockToggler.isToggledOn)
                     {
                         padlockSelectedList.AddToPadlockList(selectedObject);
@@ -130,26 +114,15 @@ public class SelectionManager : MonoBehaviour
                         // Remove the selected object from the list if it's there
                         padlockSelectedList.RemoveFromPadlockList(selectedObject);
                     }
-
-                    // Debugging: Print out the list of selected padlocks
-                    Debug.Log("Number of Selected Padlocks: " + padlockSelectedList.selectedPadlocks.Count);
-                    Debug.Log("List of Selected Padlocks: " + string.Join(", ", padlockSelectedList.selectedPadlocks.ConvertAll(padlock => padlock.name).ToArray()));
-                }
-                else 
-                {
-                    Debug.LogWarning("PadlockToggle component not found on selectedObject.");
                 }
                 break;
             case "FaceLocker":
-                Debug.Log("Selected Face: " + selectedObject.name);
-   
                 // Check if the fac lockToggler component is attached
                 MultiSelectionToggler faceLockToggler = selectedObject.GetComponent<MultiSelectionToggler>();
                 MultiSelectedList facesSelectedList = selectedObject.transform.parent.parent.GetComponent<MultiSelectedList>();
                 if (faceLockToggler != null)
                 {
                     faceLockToggler.SwitchToggleFacelock();
-                    Debug.Log("face lock state: " + faceLockToggler.isToggledOn);
         
                     if (faceLockToggler.isToggledOn)
                     {
@@ -160,14 +133,6 @@ public class SelectionManager : MonoBehaviour
                         // Remove the selected object from the list if it's there
                         facesSelectedList.RemoveFromFacesList(selectedObject);
                     }
-
-                    // Debugging: Print out the list of selected padlocks
-                    Debug.Log("Number of Selected faces: " + facesSelectedList.selectedFaces.Count);
-                    Debug.Log("List of Selected faces: " + string.Join(", ", facesSelectedList.selectedFaces.ConvertAll(padlock => padlock.name).ToArray()));
-                }
-                else 
-                {
-                    Debug.LogWarning("FaceToggle component not found on selectedObject.");
                 }
                 break;
         }
@@ -195,13 +160,13 @@ public class SelectionManager : MonoBehaviour
                 break;
             case "VertexMarker":
                 _vertexDragScript.StopDraggingVertex();
+                _mergeScript.MergeCloseFaces();
                 break;
             case "PadlockMarker":
                 break;
             case "FaceLocker":
                 break;
             default:
-                Debug.Log("Unknown Tag: " + _currentSelection);
                 break;
         }
     }

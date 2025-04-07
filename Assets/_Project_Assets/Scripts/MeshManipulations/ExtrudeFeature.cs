@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
 
-public class ExtrudeFeature_V2 : MonoBehaviour
+public class ExtrudeFeature : MonoBehaviour
 {
     // Private variables needed for extrusion
     private ObjSelector _objSelector;
@@ -144,6 +144,8 @@ public class ExtrudeFeature_V2 : MonoBehaviour
     // Called when the right index trigger is pressed to begin extrusion.
     public void CallExtrution()
     {
+        Debug.Log("Extruding");
+        
         List<Face> facesToExtrude = new List<Face>();
         
         // First, try to get multiple selected faces from your MultiSelectedList.
@@ -172,6 +174,7 @@ public class ExtrudeFeature_V2 : MonoBehaviour
         if (facesToExtrude.Count > 0)
         {
             //Store current mesh state in undo Stack
+            Debug.Log("Saving state");
             _pbMesh.GetComponent<UndoTracker>()?.SaveState();
             
             // Extrude all the selected faces simultaneously by a small initial amount.

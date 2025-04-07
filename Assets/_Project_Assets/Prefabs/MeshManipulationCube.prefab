@@ -17,8 +17,8 @@ GameObject:
   - component: {fileID: 3462377314128753129}
   - component: {fileID: 3436961411473528367}
   - component: {fileID: 5098990973183449026}
-  - component: {fileID: -3658861764026810514}
   - component: {fileID: -3797373052810387628}
+  - component: {fileID: 1404005007228594326}
   m_Layer: 6
   m_Name: MeshManipulationCube
   m_TagString: ProBuilderObj
@@ -409,18 +409,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wireColor: {r: 0, g: 0, b: 0, a: 1}
   WireframeMaterial: {fileID: 2100000, guid: b796f39d0ed7e904cba7afa247a1fe2f, type: 2}
---- !u!114 &-3658861764026810514
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4912339518013422798}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0df0e263e1538274d8f84234d2ee5323, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &-3797373052810387628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -433,4 +421,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59a8187f752aa214bbf0615924eb1be2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultMaterial: {fileID: 0}
+  maxUndoSteps: 50
+--- !u!33 &1404005007228594326
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4912339518013422798}
+  m_Mesh: {fileID: 0}

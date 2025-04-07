@@ -59,8 +59,6 @@ public class ObjSelector : MonoBehaviour
 
             if (distance < closestDistance)
             {
-                Debug.Log("New closest object: " + hit.name);
-                Debug.Log("Distance: " + distance);
                 closestDistance = distance;
                 ClosestObj = hit.transform.gameObject;
             }

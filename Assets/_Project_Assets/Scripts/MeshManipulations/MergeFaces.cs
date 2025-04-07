@@ -26,11 +26,8 @@ public class MergeFaces : MonoBehaviour
     public void MergeCloseFaces()
     {
         if (_pbMesh == null) {
-            Debug.LogWarning("MergeCloseFaces called, but no valid ProBuilderMesh found.");
             return;
         }
-
-        Debug.Log("MergeCloseFaces triggered.");
 
         List<Face> faces = new List<Face>(_pbMesh.faces);
         int mergeCount = 0;
@@ -44,8 +41,6 @@ public class MergeFaces : MonoBehaviour
 
                 if (FacesCanBeMerged(a, b))
                 {
-                    Debug.Log($"Merging faces {i} and {j} by welding their vertices.");
-
                     // Combine the indexes from both faces
                     HashSet<int> combinedIndexes = new HashSet<int>(a.indexes);
                     foreach (int idx in b.indexes)
@@ -54,14 +49,14 @@ public class MergeFaces : MonoBehaviour
                     }
                     
                     //Store current mesh state in undo Stack
-                    _pbMesh.GetComponent<UndoTracker>()?.SaveState();
+                    //_pbMesh.GetComponent<UndoTracker>()?.SaveState();
                     
                     foreach (Transform child in _pbMesh.transform)
                     {
                         Destroy(child.gameObject);
                     }
-                    _pbMesh.GetComponent<HandleUpdater>()?.ClearAll();
-                    _pbMesh.GetComponent<VertexVisualizer>()?.ClearAll();
+                    _pbMesh.GetComponent<HandleUpdater>()?.RebuildHandles();
+                    _pbMesh.GetComponent<VertexVisualizer>()?.RebuildVertices();
                     
                     VertexEditing.WeldVertices(_pbMesh, combinedIndexes, vertexMergeThreshold);
                     
@@ -73,8 +68,6 @@ public class MergeFaces : MonoBehaviour
 
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
-
-        Debug.Log($"MergeCloseFaces completed. Total merged vertex groups: {mergeCount}.");
     }
 
     private bool FacesCanBeMerged(Face a, Face b)

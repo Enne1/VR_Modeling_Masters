@@ -10,22 +10,20 @@ public class VertexVisualizer : MonoBehaviour
     private Dictionary<int, GameObject> _vertexSpheres = new Dictionary<int, GameObject>();
     private Dictionary<int, GameObject> _vertexPadlocks = new Dictionary<int, GameObject>();
     private Dictionary<int, Vector3> _lastVertexPositions = new Dictionary<int, Vector3>();
+    private HashSet<Vector3> _uniqueVertexPositions = new HashSet<Vector3>();
 
-    private HashSet<Vector3> _uniqueVertexPositions = new HashSet<Vector3>(); // Set to track unique positions
+    public GameObject spherePrefab;
+    public GameObject padlockPrefab;
+    public float padlockOffset = 0.1f;
 
-    public GameObject spherePrefab;  // Reference to the small sphere prefab
-    public GameObject padlockPrefab; // Reference to the padlock prefab
-    public float padlockOffset = 0.1f; // Distance to place the padlock outside the vertex
-    
     void Start()
     {
         _pbMesh = GetComponent<ProBuilderMesh>();
-        
         if (_pbMesh != null)
         {
             UpdateVertexSpheresAndPadlocks();
-            
-            foreach( Transform child in transform)
+
+            foreach (Transform child in transform)
             {
                 child.gameObject.SetActive(false);
             }
@@ -42,7 +40,7 @@ public class VertexVisualizer : MonoBehaviour
             UpdateVertexSpheresAndPadlocks(modifiedVertices);
         }
     }
-
+    
     void UpdateVertexSpheresAndPadlocks(List<int> modifiedVertices = null)
     {
         if (modifiedVertices == null)
@@ -96,9 +94,6 @@ public class VertexVisualizer : MonoBehaviour
     Vector3 FindPadlockPosition(Vector3 vertexPosition, int vertexIndex)
     {
         Vector3 optimalDirection = GetFurthestDirection(vertexIndex);
-        Vector3 worldVertexPosition = transform.TransformPoint(vertexPosition);
-        // Vector3 worldPadlockPosition = (worldVertexPosition + optimalDirection) * padlockOffset;
-        // return transform.InverseTransformPoint(worldPadlockPosition);
         Vector3 worldPadlockPosition = (vertexPosition + optimalDirection) * -padlockOffset;
         return worldPadlockPosition;
     }
@@ -107,7 +102,7 @@ public class VertexVisualizer : MonoBehaviour
     {
         List<Vector3> faceNormals = GetConnectedFaceNormals(vertexIndex);
         if (faceNormals.Count == 0)
-            return Vector3.up; // Default fallback
+            return Vector3.up;
 
         Vector3 sumNormals = Vector3.zero;
         foreach (Vector3 normal in faceNormals)
@@ -115,43 +110,35 @@ public class VertexVisualizer : MonoBehaviour
             sumNormals += normal;
         }
 
-        if (sumNormals == Vector3.zero)
-            return Vector3.up; // Fallback case
-
-        Vector3 bestDirection = (-sumNormals).normalized; // Invert direction
-        return bestDirection;
-    }   
+        return sumNormals == Vector3.zero ? Vector3.up : (-sumNormals).normalized;
+    }
 
     List<Vector3> GetConnectedFaceNormals(int vertexIndex)
     {
         List<Vector3> normals = new List<Vector3>();
 
-        // Get all shared vertex handles (groups of equivalent vertices)
         HashSet<int> sharedIndexes = new HashSet<int>();
-
         foreach (SharedVertex sharedVertex in _pbMesh.sharedVertices)
         {
             if (sharedVertex.Contains(vertexIndex))
             {
                 sharedIndexes.UnionWith(sharedVertex);
-                break; // Stop after finding the matching shared vertex group
+                break;
             }
         }
 
         foreach (Face face in _pbMesh.faces)
         {
-            // If any of the shared vertices exist in this face, consider it
-            if (face.indexes.Any(sharedIndexes.Contains))  
+            if (face.indexes.Any(sharedIndexes.Contains))
             {
-                Vector3 localNormal = Math.Normal(_pbMesh, face); // Local space normal
-                Vector3 worldNormal = _pbMesh.transform.TransformDirection(localNormal); // Convert to world space
-            
+                Vector3 localNormal = Math.Normal(_pbMesh, face);
+                Vector3 worldNormal = _pbMesh.transform.TransformDirection(localNormal);
                 normals.Add(worldNormal);
             }
         }
         return normals;
     }
-    
+
     List<int> GetModifiedVertices()
     {
         List<int> modifiedVertices = new List<int>();
@@ -165,12 +152,36 @@ public class VertexVisualizer : MonoBehaviour
         }
         return modifiedVertices;
     }
-    
+
     public void ClearAll()
     {
         _vertexSpheres.Clear();
         _vertexPadlocks.Clear();
         _lastVertexPositions.Clear();
         _uniqueVertexPositions.Clear();
+
+        // Destroy all previously instantiated signifier objects
+        List<Transform> childrenToDestroy = new List<Transform>();
+        foreach (Transform child in transform)
+        {
+            if (child.name.StartsWith("Sphere_") || child.name.StartsWith("Padlock_"))
+            {
+                childrenToDestroy.Add(child);
+            }
+        }
+
+        foreach (var child in childrenToDestroy)
+        {
+            Destroy(child.gameObject);
+        }
+    }
+
+    public void RebuildVertices()
+    {
+        if (_pbMesh == null)
+            _pbMesh = GetComponent<ProBuilderMesh>();
+
+        ClearAll();
+        UpdateVertexSpheresAndPadlocks();
     }
 }

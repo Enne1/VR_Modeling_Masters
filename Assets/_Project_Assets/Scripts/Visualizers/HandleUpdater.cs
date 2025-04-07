@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
@@ -87,6 +88,7 @@ public class HandleUpdater : MonoBehaviour
             else
             {
                 GameObject handle = Instantiate(handlePrefab, faceCenter, faceRotation);
+                handle.name = $"FaceHandle_{face.indexes.FirstOrDefault()}";
                 handle.transform.SetParent(_pbMesh.transform, true);
                 _faceHandles[face] = handle;
             }
@@ -155,5 +157,32 @@ public class HandleUpdater : MonoBehaviour
         _lastFaceCenters.Clear();
         _lastFaceRotations.Clear();
         _faceEdges.Clear();
+
+        // Destroy previously instantiated face handle GameObjects
+        List<Transform> childrenToDestroy = new List<Transform>();
+        foreach (Transform child in transform)
+        {
+            if (child.name.StartsWith("FaceHandle_"))
+            {
+                childrenToDestroy.Add(child);
+            }
+        }
+
+        foreach (var child in childrenToDestroy)
+        {
+            Destroy(child.gameObject);
+        }
     }
+    
+    public void RebuildHandles()
+    {
+        if (_pbMesh == null) _pbMesh = GetComponent<ProBuilderMesh>();
+        if (_pbMesh != null)
+        {
+            ClearAll();
+            UpdateHandles(); // Rebuild from scratch
+        }
+    }
+
+
 }
