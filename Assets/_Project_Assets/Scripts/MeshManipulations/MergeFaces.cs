@@ -8,9 +8,6 @@ public class MergeFaces : MonoBehaviour
     private ObjSelector _objSelector;
     private ProBuilderMesh _pbMesh;
     
-    public GameObject ResetSignifierManager;
-    private ResetSignifiers _resetSignifiersScript;
-
     public float vertexMergeThreshold = 0.001f;
 
     void Start()
@@ -59,10 +56,14 @@ public class MergeFaces : MonoBehaviour
                     //Store current mesh state in undo Stack
                     _pbMesh.GetComponent<UndoTracker>()?.SaveState();
                     
-                    VertexEditing.WeldVertices(_pbMesh, combinedIndexes, vertexMergeThreshold);
+                    foreach (Transform child in _pbMesh.transform)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                    _pbMesh.GetComponent<HandleUpdater>()?.ClearAll();
+                    _pbMesh.GetComponent<VertexVisualizer>()?.ClearAll();
                     
-                    _resetSignifiersScript = ResetSignifierManager.GetComponent<ResetSignifiers>();
-                    _resetSignifiersScript.ReaddSignifiers();
+                    VertexEditing.WeldVertices(_pbMesh, combinedIndexes, vertexMergeThreshold);
                     
                     mergeCount++;
                     break; // Avoid modifying structure mid-loop

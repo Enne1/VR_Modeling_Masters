@@ -13,6 +13,13 @@ public class ProximityScaler : MonoBehaviour
     private List<Transform> _scalableObjects = new List<Transform>();
     private Dictionary<Transform, Vector3> _originalScales = new Dictionary<Transform, Vector3>();
     private GameObject _currObj;
+
+    public void ResetScales()
+    {
+        _scalableObjects.Clear();
+        _originalScales.Clear();
+        FindScalableObjects();
+    }
     
     public void SetScales(GameObject pbObj)
     {
@@ -65,6 +72,8 @@ public class ProximityScaler : MonoBehaviour
     {
         foreach (Transform obj in _scalableObjects)
         {
+            if (obj == null) continue;
+            
             if (IsParentScalable(obj))
                 continue; // Skip scaling if the parent is already being scaled
             
@@ -81,6 +90,8 @@ public class ProximityScaler : MonoBehaviour
     
     bool IsParentScalable(Transform obj)
     {
+        if (obj == null) return false;
+        
         Transform parent = obj.parent;
         while (parent != null)
         {

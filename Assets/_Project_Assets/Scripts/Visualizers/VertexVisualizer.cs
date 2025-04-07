@@ -166,18 +166,11 @@ public class VertexVisualizer : MonoBehaviour
         return modifiedVertices;
     }
     
-    
-    public void RebuildVertices()
+    public void ClearAll()
     {
-        if (_pbMesh == null) _pbMesh = GetComponent<ProBuilderMesh>();
-        if (_pbMesh != null)
-        {
-            _vertexSpheres.Clear();
-            _vertexPadlocks.Clear();
-            _lastVertexPositions.Clear();
-            _uniqueVertexPositions.Clear();
-
-            UpdateVertexSpheresAndPadlocks();
-        }
+        _vertexSpheres.Clear();
+        _vertexPadlocks.Clear();
+        _lastVertexPositions.Clear();
+        _uniqueVertexPositions.Clear();
     }
 }

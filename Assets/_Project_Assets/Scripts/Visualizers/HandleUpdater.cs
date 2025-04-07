@@ -149,17 +149,11 @@ public class HandleUpdater : MonoBehaviour
         return bestEdge;
     }
     
-    public void RebuildHandles()
+    public void ClearAll()
     {
-        if (_pbMesh == null) _pbMesh = GetComponent<ProBuilderMesh>();
-        if (_pbMesh != null)
-        {
-            _faceHandles.Clear();
-            _lastFaceCenters.Clear();
-            _lastFaceRotations.Clear();
-            _faceEdges.Clear();
-
-            UpdateHandles();
-        }
+        _faceHandles.Clear();
+        _lastFaceCenters.Clear();
+        _lastFaceRotations.Clear();
+        _faceEdges.Clear();
     }
 }

@@ -1,5 +1,5 @@
 using UnityEngine;
-using TMPro; // Required for using TextMeshProUGUI
+using TMPro;
 
 public class ConsoleToGUI : MonoBehaviour
 {
@@ -7,7 +7,7 @@ public class ConsoleToGUI : MonoBehaviour
     private string output;
     private string stack;
 
-    public TextMeshProUGUI debugText; // Reference to the TextMeshProUGUI component
+    public TextMeshProUGUI debugText;
 
     void OnEnable()
     {
@@ -23,20 +23,32 @@ public class ConsoleToGUI : MonoBehaviour
     {
         output = logString;
         stack = stackTrace;
-        myLog = output + "\n" + myLog; // Separate logs by newlines for readability
-        if (myLog.Length > 5000)
+
+        // Add log type prefix
+        string prefix = $"[{type}]";
+        string logEntry = $"{prefix} {output}";
+
+        // Only include stack trace for errors and exceptions
+        if (type == LogType.Error || type == LogType.Exception)
         {
-            myLog = myLog.Substring(0, 4000);
+            logEntry += $"\n{stack}";
         }
 
-        // Update the TextMeshProUGUI text to show the current log
+        // Add to the top of the log
+        myLog = logEntry + "\n\n" + myLog;
+
+        // Truncate if too long
+        if (myLog.Length > 10000)
+        {
+            myLog = myLog.Substring(0, 8000);
+        }
+
         if (debugText != null)
         {
             debugText.text = myLog;
         }
     }
 
-    // Optional: A method to clear the log if desired (you could call this from a button)
     public void ClearLog()
     {
         myLog = "";
