@@ -365,7 +365,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handlePrefab: {fileID: 9096372030887335246, guid: 1ce44d2c4eedd4145ab20a99232a580d, type: 3}
-  placeholderSignifier: {fileID: 0}
 --- !u!114 &3462377314128753129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -380,7 +379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spherePrefab: {fileID: 268898002019252168, guid: b28d87bef8c4ac542aa8965009435cc8, type: 3}
   padlockPrefab: {fileID: 8933404996358485184, guid: e482c5cd5f096e446b7b6a9e271407b4, type: 3}
-  padlockOffset: 0.05
+  padlockOffset: 0.04
 --- !u!114 &3436961411473528367
 MonoBehaviour:
   m_ObjectHideFlags: 0

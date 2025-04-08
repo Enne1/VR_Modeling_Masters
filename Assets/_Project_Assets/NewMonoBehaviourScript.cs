@@ -2,16 +2,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
-using UnityEngine.UIElements;
 
-public class ExtrudeFeature : MonoBehaviour
+public class ExtrudeFeatureOLD : MonoBehaviour
 {
     // Private variables needed for extrusion
     private ObjSelector _objSelector;
     private ProBuilderMesh _pbMesh;
-    // _selectedFace will be the primary (first) face—now, always the face under the controller.
+    // _selectedFace will be the primary (first) face in the multi-selection
     private Face _selectedFace;
-    // Additional faces that are extruded.
+    // Additional faces that are extruded
     private List<Face> _dragAlongFaces = new List<Face>(); 
     private bool _isDragging;
     private Vector3 _initialControllerPos;
@@ -21,8 +20,6 @@ public class ExtrudeFeature : MonoBehaviour
     // Multi-extrusion tracking: union of vertex indices from all extruded faces
     private HashSet<int> _selectedVertexIndices = new HashSet<int>();
     private Dictionary<int, Vector3> _initialVertexWorldPositions = new Dictionary<int, Vector3>();
-
-    private float totalDraggedDistance;
     
     // Public variables
     public GameObject rightController;
@@ -105,11 +102,6 @@ public class ExtrudeFeature : MonoBehaviour
     // Reset variables when stopping the extrusion.
     public void StopDraggingFace()
     {
-        if (totalDraggedDistance < 0.01f)
-        {
-            Debug.Log("Dragged distance" + totalDraggedDistance + " Is too small. Reverting");
-            _pbMesh.GetComponent<UndoTracker>()?.Undo();
-        }
         _isDragging = false;
         _selectedFace = null;
         _dragAlongFaces.Clear();
@@ -147,26 +139,17 @@ public class ExtrudeFeature : MonoBehaviour
         
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
-
-        totalDraggedDistance = finalMovement.magnitude;
     }
     
     // Called when the right index trigger is pressed to begin extrusion.
     public void CallExtrution()
     {
         Debug.Log("Extruding");
-        List<Face> facesToExtrude = new List<Face>();
         
-        // Always start by finding the face closest to the controller.
-        Face controllerFace = GetClosestFace();
-        if (controllerFace != null)
-        {
-            facesToExtrude.Add(controllerFace);
-        }
+        List<Face> facesToExtrude = new List<Face>();
         
         // First, try to get multiple selected faces from your MultiSelectedList.
         MultiSelectedList facesSelectedList = _pbMesh.transform.GetComponent<MultiSelectedList>();
-        Debug.Log("List: " + facesSelectedList);
         if (facesSelectedList != null && facesSelectedList.selectedFaces != null && facesSelectedList.selectedFaces.Count > 0)
         {
             foreach (var faceObj in facesSelectedList.selectedFaces)
@@ -175,8 +158,16 @@ public class ExtrudeFeature : MonoBehaviour
                 if (extrudeFace != null && !facesToExtrude.Contains(extrudeFace))
                 {
                     facesToExtrude.Add(extrudeFace);
-                    Debug.Log("Adding: " + extrudeFace);
                 }
+            }
+        }
+        else
+        {
+            // Fallback: use the closest face.
+            Face closestFace = GetClosestFace();
+            if (closestFace != null)
+            {
+                facesToExtrude.Add(closestFace);
             }
         }
         
@@ -187,7 +178,7 @@ public class ExtrudeFeature : MonoBehaviour
             _pbMesh.GetComponent<UndoTracker>()?.SaveState();
             
             // Extrude all the selected faces simultaneously by a small initial amount.
-            _pbMesh.Extrude(facesToExtrude, ExtrudeMethod.FaceNormal, .001f);
+            _pbMesh.Extrude(facesToExtrude, ExtrudeMethod.IndividualFaces, .01f);
             _pbMesh.ToMesh();
             _pbMesh.Refresh();
             
@@ -196,7 +187,6 @@ public class ExtrudeFeature : MonoBehaviour
             _dragAlongFaces.Clear();
             for (int i = 1; i < facesToExtrude.Count; i++)
             {
-                Debug.Log("faces to extrude: " + facesToExtrude);
                 _dragAlongFaces.Add(facesToExtrude[i]);
             }
             

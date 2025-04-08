@@ -35,6 +35,7 @@ public class VertexVisualizer : MonoBehaviour
         if (_pbMesh == null) return;
 
         List<int> modifiedVertices = GetModifiedVertices();
+        Debug.Log("Updated vertices: " + modifiedVertices.Count);
         if (modifiedVertices.Count > 0)
         {
             UpdateVertexSpheresAndPadlocks(modifiedVertices);
@@ -43,6 +44,7 @@ public class VertexVisualizer : MonoBehaviour
     
     void UpdateVertexSpheresAndPadlocks(List<int> modifiedVertices = null)
     {
+        Debug.Log("Updating Vertices");
         if (modifiedVertices == null)
         {
             modifiedVertices = new List<int>();

@@ -13,11 +13,8 @@ public class HandleUpdater : MonoBehaviour
     
     private Dictionary<Face, Edge> _faceEdges = new Dictionary<Face, Edge>();
 
-
     public GameObject handlePrefab;
-    public GameObject placeholderSignifier;
-    //public float handleSize = 0.02f;
-
+    
     void Start()
     {
         _pbMesh = GetComponent<ProBuilderMesh>();
@@ -38,6 +35,7 @@ public class HandleUpdater : MonoBehaviour
         if (_pbMesh == null) return;
 
         List<Face> modifiedFaces = GetModifiedFaces();
+        Debug.Log("Updated handles: " + modifiedFaces.Count);
         if (modifiedFaces.Count > 0)
         {
             UpdateHandles(modifiedFaces);
@@ -46,6 +44,7 @@ public class HandleUpdater : MonoBehaviour
 
     void UpdateHandles(List<Face> modifiedFaces = null)
     {
+        Debug.Log("Updating handles");
         if (modifiedFaces == null)
         {
             modifiedFaces = new List<Face>(_pbMesh.faces);

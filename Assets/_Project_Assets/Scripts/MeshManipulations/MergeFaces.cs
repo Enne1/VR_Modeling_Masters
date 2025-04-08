@@ -60,6 +60,15 @@ public class MergeFaces : MonoBehaviour
                     
                     VertexEditing.WeldVertices(_pbMesh, combinedIndexes, vertexMergeThreshold);
                     
+                    // Clear face and padlock selections to prevent broken references after merge
+                    MultiSelectedList selList = _pbMesh.GetComponent<MultiSelectedList>();
+                    if (selList != null)
+                    {
+                        selList.selectedFaces.Clear();
+                        selList.selectedPadlocks.Clear();
+                        Debug.Log("[Merge] Cleared multi-selections after merge.");
+                    }
+                    
                     mergeCount++;
                     break; // Avoid modifying structure mid-loop
                 }
