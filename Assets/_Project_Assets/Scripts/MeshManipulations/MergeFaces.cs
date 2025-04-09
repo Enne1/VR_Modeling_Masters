@@ -41,37 +41,43 @@ public class MergeFaces : MonoBehaviour
 
                 if (FacesCanBeMerged(a, b))
                 {
-                    // Combine the indexes from both faces
+                    // Combine the vertex indexes
                     HashSet<int> combinedIndexes = new HashSet<int>(a.indexes);
                     foreach (int idx in b.indexes)
-                    {
                         combinedIndexes.Add(idx);
-                    }
-                    
-                    //Store current mesh state in undo Stack
-                    //_pbMesh.GetComponent<UndoTracker>()?.SaveState();
-                    
+
+                    // Save original face references BEFORE modifying mesh
+                    Face originalA = a;
+                    Face originalB = b;
+
+                    // Save for undo
+                    _pbMesh.GetComponent<UndoTracker>()?.SaveState();
+
                     foreach (Transform child in _pbMesh.transform)
-                    {
                         Destroy(child.gameObject);
-                    }
+
+                    _pbMesh.GetComponent<HandleUpdater>()?.ClearAll();
+                    _pbMesh.GetComponent<VertexVisualizer>()?.ClearAll();
+
+                    // Weld vertices first (modifies mesh)
+                    VertexEditing.WeldVertices(_pbMesh, combinedIndexes, vertexMergeThreshold);
+
+                    // Remove the exact face objects we merged
+                    //_pbMesh.faces.RemoveAll(f => f == originalA || f == originalB);
+                    
+                    // Remove the exact face objects we merged
+                    var newFaces = new List<Face>(_pbMesh.faces);
+                    newFaces.RemoveAll(f => f == originalA || f == originalB);
+                    _pbMesh.faces = newFaces;
+                    
+                    // Refresh mesh and visuals
+                    _pbMesh.ToMesh();
+                    _pbMesh.Refresh();
+
                     _pbMesh.GetComponent<HandleUpdater>()?.RebuildHandles();
                     _pbMesh.GetComponent<VertexVisualizer>()?.RebuildVertices();
-                    
-                    VertexEditing.WeldVertices(_pbMesh, combinedIndexes, vertexMergeThreshold);
-                    
-                    // Clear face and padlock selections to prevent broken references after merge
-                    MultiSelectedList selList = _pbMesh.GetComponent<MultiSelectedList>();
-                    if (selList != null)
-                    {
-                        selList.selectedFaces.Clear();
-                        selList.selectedPadlocks.Clear();
-                        Debug.Log("[Merge] Cleared multi-selections after merge.");
-                    }
-                    
-                    mergeCount++;
-                    break; // Avoid modifying structure mid-loop
                 }
+
             }
         }
 
