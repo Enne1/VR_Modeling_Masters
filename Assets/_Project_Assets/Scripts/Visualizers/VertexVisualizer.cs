@@ -45,12 +45,6 @@ public class VertexVisualizer : MonoBehaviour
             UpdateVertexSpheresAndPadlocks(modifiedVertices);
         }
     }
-
-    public void EnsureSignifierUpdate()
-    {
-        Debug.Log("yeah Boi");
-        UpdateVertexSpheresAndPadlocks();
-    }
     
     /// <summary>
     /// Updates or creates the vertex spheres and padlocks.

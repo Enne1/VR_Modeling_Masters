@@ -51,7 +51,7 @@ public class MergeFaces : MonoBehaviour
                     Face originalB = b;
 
                     // Save for undo
-                    _pbMesh.GetComponent<UndoTracker>()?.SaveState();
+                    //_pbMesh.GetComponent<UndoTracker>()?.SaveState();
 
                     foreach (Transform child in _pbMesh.transform)
                         Destroy(child.gameObject);
