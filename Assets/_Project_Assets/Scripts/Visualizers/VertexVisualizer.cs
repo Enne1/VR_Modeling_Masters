@@ -61,8 +61,9 @@ public class VertexVisualizer : MonoBehaviour
                 modifiedVertices.Add(i);
             }
         }
-        //Debug.Log("Modified vertices: " + modifiedVertices.Count);
-
+        
+        Debug.Log("Modifying vertex spheres: " + modifiedVertices.Count);
+        
         foreach (int vertexIndex in modifiedVertices)
         {
             // Get vertex position in local space and convert to world space.
