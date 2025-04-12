@@ -1,16 +1,15 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
-using UnityEngine.ProBuilder.MeshOperations;
+using System.Linq;
 
 public class HandleUpdater : MonoBehaviour
 {
     private ProBuilderMesh _pbMesh;
-    private Dictionary<Face, GameObject> _faceHandles = new Dictionary<Face, GameObject>();
-    private Dictionary<Face, Vector3> _lastFaceCenters = new Dictionary<Face, Vector3>();
-    private Dictionary<Face, Quaternion> _lastFaceRotations = new Dictionary<Face, Quaternion>();
-    private Dictionary<Face, Edge> _faceEdges = new Dictionary<Face, Edge>();
+    private Dictionary<int, GameObject> _faceHandles = new Dictionary<int, GameObject>();
+    private Dictionary<int, Vector3> _lastFaceCenters = new Dictionary<int, Vector3>();
+    private Dictionary<int, Quaternion> _lastFaceRotations = new Dictionary<int, Quaternion>();
+    private Dictionary<int, Edge> _faceEdges = new Dictionary<int, Edge>();
 
     public GameObject handlePrefab;
     public GameObject placeholderSignifier;
@@ -22,6 +21,7 @@ public class HandleUpdater : MonoBehaviour
         if (_pbMesh != null)
         {
             UpdateHandles();
+            StoreFaceStates();
             foreach (Transform child in transform)
             {
                 child.gameObject.SetActive(false);
@@ -33,22 +33,51 @@ public class HandleUpdater : MonoBehaviour
     {
         if (_pbMesh == null) return;
 
-        // Clear if there's any stale face reference
-        if (_faceHandles.Keys.Any(f => !_pbMesh.faces.Contains(f)))
+        List<Face> modifiedFaces = new List<Face>();
+
+        foreach (Face face in _pbMesh.faces)
         {
-            ClearAll();
-            UpdateHandles();
-            return;
+            if (face == null || face.indexes == null || face.indexes.Count == 0) continue;
+
+            int faceId = face.indexes.Min();
+            Vector3 currentCenter = GetFaceCenter(face);
+            Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, face));
+
+            if (!_faceEdges.ContainsKey(faceId))
+            {
+                _faceEdges[faceId] = GetLongestEdge(face);
+            }
+
+            Edge longestEdge = _faceEdges[faceId];
+
+            if (longestEdge.a < 0 || longestEdge.b < 0 ||
+                longestEdge.a >= _pbMesh.positions.Count || longestEdge.b >= _pbMesh.positions.Count)
+                continue;
+
+            Vector3 pointA = _pbMesh.transform.TransformPoint(_pbMesh.positions[longestEdge.a]);
+            Vector3 pointB = _pbMesh.transform.TransformPoint(_pbMesh.positions[longestEdge.b]);
+            Vector3 edgeDir = (pointB - pointA).normalized;
+
+            Quaternion currentRotation = Quaternion.LookRotation(faceNormal.normalized, edgeDir.normalized);
+
+            bool centerChanged = !_lastFaceCenters.ContainsKey(faceId) || Vector3.Distance(_lastFaceCenters[faceId], currentCenter) > 0.001f;
+            bool rotationChanged = !_lastFaceRotations.ContainsKey(faceId) || Quaternion.Angle(_lastFaceRotations[faceId], currentRotation) > 0.1f;
+
+            if (centerChanged || rotationChanged)
+            {
+                modifiedFaces.Add(face);
+                _lastFaceCenters[faceId] = currentCenter;
+                _lastFaceRotations[faceId] = currentRotation;
+            }
         }
 
-        List<Face> modifiedFaces = GetModifiedFaces();
         if (modifiedFaces.Count > 0)
         {
             UpdateHandles(modifiedFaces);
         }
     }
 
-    void UpdateHandles(List<Face> modifiedFaces = null)
+    public void UpdateHandles(List<Face> modifiedFaces = null)
     {
         if (_pbMesh == null) return;
 
@@ -62,15 +91,16 @@ public class HandleUpdater : MonoBehaviour
             if (face == null || face.indexes == null || face.indexes.Count == 0)
                 continue;
 
+            int faceId = face.indexes.Min();
             Vector3 faceCenter = GetFaceCenter(face);
             Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, face));
 
-            if (!_faceEdges.ContainsKey(face))
+            if (!_faceEdges.ContainsKey(faceId))
             {
-                _faceEdges[face] = GetLongestEdge(face);
+                _faceEdges[faceId] = GetLongestEdge(face);
             }
 
-            Edge longestEdge = _faceEdges[face];
+            Edge longestEdge = _faceEdges[faceId];
 
             if (longestEdge.a < 0 || longestEdge.b < 0 ||
                 longestEdge.a >= _pbMesh.positions.Count || longestEdge.b >= _pbMesh.positions.Count)
@@ -80,17 +110,14 @@ public class HandleUpdater : MonoBehaviour
             Vector3 pointB = _pbMesh.transform.TransformPoint(_pbMesh.positions[longestEdge.b]);
             Vector3 longestEdgeDir = (pointB - pointA).normalized;
 
-            Quaternion faceRotation = Quaternion.LookRotation(faceNormal, longestEdgeDir);
+            Quaternion faceRotation = Quaternion.LookRotation(
+                Vector3.Normalize(faceNormal),
+                Vector3.Normalize(longestEdgeDir)
+            );
 
-            if (_lastFaceCenters.ContainsKey(face) && _lastFaceCenters[face] == faceCenter &&
-                _lastFaceRotations.ContainsKey(face) && _lastFaceRotations[face] == faceRotation)
+            if (_faceHandles.ContainsKey(faceId))
             {
-                continue;
-            }
-
-            if (_faceHandles.ContainsKey(face))
-            {
-                GameObject handle = _faceHandles[face];
+                GameObject handle = _faceHandles[faceId];
                 if (handle != null)
                 {
                     handle.transform.position = faceCenter;
@@ -100,13 +127,13 @@ public class HandleUpdater : MonoBehaviour
             else
             {
                 GameObject handle = Instantiate(handlePrefab, faceCenter, faceRotation);
-                handle.name = $"FaceHandle_{face.indexes[0]}";
+                handle.name = $"FaceHandle_{faceId}";
                 handle.transform.SetParent(_pbMesh.transform, true);
-                _faceHandles[face] = handle;
+                _faceHandles[faceId] = handle;
             }
 
-            _lastFaceCenters[face] = faceCenter;
-            _lastFaceRotations[face] = faceRotation;
+            _lastFaceCenters[faceId] = faceCenter;
+            _lastFaceRotations[faceId] = faceRotation;
         }
     }
 
@@ -118,28 +145,6 @@ public class HandleUpdater : MonoBehaviour
             sum += _pbMesh.transform.TransformPoint(_pbMesh.positions[index]);
         }
         return sum / face.indexes.Count;
-    }
-
-    List<Face> GetModifiedFaces()
-    {
-        List<Face> modifiedFaces = new List<Face>();
-        foreach (Face face in _pbMesh.faces)
-        {
-            if (face == null || face.indexes == null || face.indexes.Count == 0) continue;
-
-            Vector3 faceCenter = GetFaceCenter(face);
-            Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, face));
-            Quaternion faceRotation = Quaternion.LookRotation(faceNormal);
-
-            bool centerChanged = !_lastFaceCenters.ContainsKey(face) || _lastFaceCenters[face] != faceCenter;
-            bool rotationChanged = !_lastFaceRotations.ContainsKey(face) || _lastFaceRotations[face] != faceRotation;
-
-            if (centerChanged || rotationChanged)
-            {
-                modifiedFaces.Add(face);
-            }
-        }
-        return modifiedFaces;
     }
 
     Edge GetLongestEdge(Face face)
@@ -170,6 +175,36 @@ public class HandleUpdater : MonoBehaviour
         }
 
         return bestEdge;
+    }
+
+    void StoreFaceStates()
+    {
+        foreach (Face face in _pbMesh.faces)
+        {
+            if (face == null || face.indexes == null || face.indexes.Count == 0) continue;
+
+            int faceId = face.indexes.Min();
+            Vector3 faceCenter = GetFaceCenter(face);
+            Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, face));
+
+            if (!_faceEdges.ContainsKey(faceId))
+            {
+                _faceEdges[faceId] = GetLongestEdge(face);
+            }
+
+            Edge edge = _faceEdges[faceId];
+            if (edge.a < 0 || edge.b < 0 || edge.a >= _pbMesh.positions.Count || edge.b >= _pbMesh.positions.Count)
+                continue;
+
+            Vector3 pointA = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.a]);
+            Vector3 pointB = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.b]);
+            Vector3 edgeDir = (pointB - pointA).normalized;
+
+            Quaternion faceRotation = Quaternion.LookRotation(faceNormal.normalized, edgeDir.normalized);
+
+            _lastFaceCenters[faceId] = faceCenter;
+            _lastFaceRotations[faceId] = faceRotation;
+        }
     }
 
     public void ClearAll()
