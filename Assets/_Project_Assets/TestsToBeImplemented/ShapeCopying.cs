@@ -1,10 +1,10 @@
 using UnityEngine;
-using UnityEngine.ProBuilder;
 
-public class ShapeSpawning : MonoBehaviour
+public class ShapeCopying : MonoBehaviour
 {
-    // Public variables
+// Public variables
     public GameObject proBuilderShape;
+    public GameObject copyPlayform;
     public float spawnRadius;
     public LayerMask detectionLayer; 
 
@@ -27,7 +27,9 @@ public class ShapeSpawning : MonoBehaviour
         
         if (!Physics.CheckSphere(transform.position, spawnRadius, detectionLayer, QueryTriggerInteraction.Collide))
         {
-            Instantiate(proBuilderShape, transform.position, Quaternion.identity);
+            var copiedMesh = copyPlayform.GetComponent<SaveTest>();
+            copiedMesh.copiedMesh = Instantiate(proBuilderShape, transform.position, Quaternion.identity);
+            copiedMesh.LoadData();
         }
     }
 }

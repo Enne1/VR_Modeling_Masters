@@ -148,6 +148,7 @@ public class ExtrudeFeature : MonoBehaviour
         float movementAlongNormal = Vector3.Dot(movementDelta, faceNormal);
         Vector3 constrainedMovement = faceNormal * movementAlongNormal;
         
+        Debug.Log("Should start tick");
         tickGen?.UpdateTicks(Mathf.Abs(movementAlongNormal));
         
         // For extrusion, we use the constrained movement.
@@ -162,6 +163,7 @@ public class ExtrudeFeature : MonoBehaviour
         }
         _pbMesh.positions = newPositions;
         
+        _pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
 

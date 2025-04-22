@@ -19,6 +19,8 @@ GameObject:
   - component: {fileID: 5098990973183449026}
   - component: {fileID: -3797373052810387628}
   - component: {fileID: 1404005007228594326}
+  - component: {fileID: 1466907519039517711}
+  - component: {fileID: 3418452356361821005}
   m_Layer: 6
   m_Name: MeshManipulationCube
   m_TagString: ProBuilderObj
@@ -365,6 +367,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handlePrefab: {fileID: 9096372030887335246, guid: 1ce44d2c4eedd4145ab20a99232a580d, type: 3}
+  placeholderSignifier: {fileID: 0}
 --- !u!114 &3462377314128753129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -429,3 +432,31 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4912339518013422798}
   m_Mesh: {fileID: 0}
+--- !u!114 &1466907519039517711
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4912339518013422798}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 080e75cfdd9567a46a7cc9e4ad5acb82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  edgePrefab: {fileID: 5997420692723999810, guid: 5464e67822d79594bbf9c6544e32aea7, type: 3}
+--- !u!114 &3418452356361821005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4912339518013422798}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80e4f00fbc816b44f9a0796c4c6f3603, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tickPrefab: {fileID: 0}
+  spacing: 0.05
+  maxLength: 1.5

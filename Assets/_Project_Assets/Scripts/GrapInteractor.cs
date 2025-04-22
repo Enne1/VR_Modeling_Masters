@@ -12,6 +12,9 @@ public class GrapInteractor : MonoBehaviour
     private Vector3 _relativeDistance;
     private Vector3 _initialScale;
     private Quaternion _relativeRotation;
+    
+    public LayerMask socketLayer;        // assign your Socket objects’ layer here
+    public float socketSnapRadius = 0.25f; // how far to search for sockets
 
     //private WireframeWithVertices _wireframeScript;
 

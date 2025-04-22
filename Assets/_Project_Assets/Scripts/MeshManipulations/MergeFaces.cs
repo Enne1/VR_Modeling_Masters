@@ -30,7 +30,6 @@ public class MergeFaces : MonoBehaviour
         }
 
         List<Face> faces = new List<Face>(_pbMesh.faces);
-        int mergeCount = 0;
 
         for (int i = 0; i < faces.Count; i++)
         {
@@ -80,6 +79,8 @@ public class MergeFaces : MonoBehaviour
 
             }
         }
+        
+        _pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
 
         _pbMesh.ToMesh();
         _pbMesh.Refresh();

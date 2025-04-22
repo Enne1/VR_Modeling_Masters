@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
+using UnityEngine.ProBuilder.MeshOperations;
 
 public class UndoTracker : MonoBehaviour
 {
@@ -79,6 +80,7 @@ public class UndoTracker : MonoBehaviour
         _pbMesh.positions = new List<Vector3>(snapshotMesh.positions);
         _pbMesh.faces = snapshotMesh.faces.Select(f => new Face(f)).ToList();
         _pbMesh.sharedVertices = snapshotMesh.sharedVertices.Select(sv => new SharedVertex(sv)).ToArray();
+        _pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
 
