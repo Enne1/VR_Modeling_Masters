@@ -4,19 +4,22 @@ using UnityEngine.ProBuilder;
 using System.Linq;
 using System.IO;
 
-public class SaveTest : MonoBehaviour
+public class CopySaveMesh : MonoBehaviour
 {
     public Transform snapPoint;
     public LayerMask draggableLayers;
     public GameObject defaultCube;
     public GameObject copiedMesh;
     public GameObject spawnPlatform;
+    public GameObject grabManager;
+    public GameObject[] saveCopyIcon;
     public string fileName;
     
     private string fullPath;
     private bool _isHooked;
     private string _json;
     private GameObject _candidate;
+
     
     void Start()
     {
@@ -30,6 +33,8 @@ public class SaveTest : MonoBehaviour
         if (content.Length > 0)
         {
             GameObject savedObj = Instantiate(defaultCube, snapPoint.transform.position, Quaternion.identity);
+            saveCopyIcon[0].SetActive(false);
+            saveCopyIcon[1].SetActive(true);
             
             ProBuilderMeshData loadedData = JsonUtility.FromJson<ProBuilderMeshData>(File.ReadAllText(fullPath));
 
@@ -51,6 +56,10 @@ public class SaveTest : MonoBehaviour
         {
             
             _candidate = other.gameObject;
+            
+            grabManager.GetComponent<GrapInteractor>().DetachFromController();
+            other.transform.position = snapPoint.position;
+            PBUtils.NormalizeMeshSize(other.GetComponent<ProBuilderMesh>(), 0.1f);
             
             // Save Mesh data
             ProBuilderMesh otherPb = other.gameObject.GetComponent<ProBuilderMesh>();
@@ -75,6 +84,8 @@ public class SaveTest : MonoBehaviour
             // Enable the copying
             var platformObj = spawnPlatform.GetComponent<ShapeCopying>();
             platformObj.proBuilderShape = defaultCube;
+            saveCopyIcon[0].SetActive(false);
+            saveCopyIcon[1].SetActive(true);
             
             _isHooked = true;
         }
@@ -89,6 +100,8 @@ public class SaveTest : MonoBehaviour
 
                 var platformObj = spawnPlatform.GetComponent<ShapeCopying>();
                 platformObj.proBuilderShape = _candidate;
+                saveCopyIcon[0].SetActive(true);
+                saveCopyIcon[1].SetActive(false);
                 
                 try
                 {
@@ -113,6 +126,9 @@ public class SaveTest : MonoBehaviour
         mesh.positions = new List<Vector3>(loadedData.positions);
         mesh.faces = loadedData.faces.Select(sf => sf.ToFace()).ToList();
         mesh.sharedVertices = loadedData.sharedVertices.Select(sv => sv.ToSharedVertex()).ToArray();
+        
+        PBUtils.NormalizeMeshSize(mesh, 0.2f);
+        
         mesh.ToMesh();
         mesh.Refresh();
     }

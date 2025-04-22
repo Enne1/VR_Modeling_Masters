@@ -143,6 +143,7 @@ public class SelectionManager : MonoBehaviour
         switch (_currentSelection)
         {
             case "FaceHandle":
+                Debug.Log("Caused by face");
                 if (_rightTrigger)
                 {
                     _extrudeScript.StopDraggingFace();
@@ -160,6 +161,7 @@ public class SelectionManager : MonoBehaviour
                 break;
             case "VertexMarker":
                 _vertexDragScript.StopDraggingVertex();
+                Debug.Log("Caused by vertex");
                 _mergeScript.MergeCloseFaces();
                 break;
             case "PadlockMarker":

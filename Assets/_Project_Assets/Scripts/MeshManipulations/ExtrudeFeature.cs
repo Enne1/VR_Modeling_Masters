@@ -28,10 +28,6 @@ public class ExtrudeFeature : MonoBehaviour
     public GameObject rightController;
     public float minExtrudeDistance;
     
-    public GameObject tickManagerPrefab;
-    private TickMarkGenerator tickGen;
-
-    
     void Start()
     {
         _objSelector = FindFirstObjectByType<ObjSelector>();
@@ -106,11 +102,6 @@ public class ExtrudeFeature : MonoBehaviour
         }
         
         Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, _selectedFace));
-
-        GameObject tickObj = Instantiate(tickManagerPrefab);
-        tickGen = tickObj.GetComponent<TickMarkGenerator>();
-        tickGen.Initialize(_initialFaceCenter, faceNormal);
-
     }
     
     // Reset variables when stopping the extrusion.
@@ -126,10 +117,6 @@ public class ExtrudeFeature : MonoBehaviour
         _dragAlongFaces.Clear();
         _selectedVertexIndices.Clear();
         _initialVertexWorldPositions.Clear();
-        
-        tickGen?.ClearAll();
-        Destroy(tickGen?.gameObject);
-        tickGen = null;
     }
     
     // Update the extruded geometry based on controller movement.
@@ -148,9 +135,6 @@ public class ExtrudeFeature : MonoBehaviour
         float movementAlongNormal = Vector3.Dot(movementDelta, faceNormal);
         Vector3 constrainedMovement = faceNormal * movementAlongNormal;
         
-        Debug.Log("Should start tick");
-        tickGen?.UpdateTicks(Mathf.Abs(movementAlongNormal));
-        
         // For extrusion, we use the constrained movement.
         Vector3 finalMovement = constrainedMovement;
         
@@ -163,7 +147,7 @@ public class ExtrudeFeature : MonoBehaviour
         }
         _pbMesh.positions = newPositions;
         
-        _pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
+        //_pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
 

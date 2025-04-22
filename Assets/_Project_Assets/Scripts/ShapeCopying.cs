@@ -27,7 +27,7 @@ public class ShapeCopying : MonoBehaviour
         
         if (!Physics.CheckSphere(transform.position, spawnRadius, detectionLayer, QueryTriggerInteraction.Collide))
         {
-            var copiedMesh = copyPlayform.GetComponent<SaveTest>();
+            var copiedMesh = copyPlayform.GetComponent<CopySaveMesh>();
             copiedMesh.copiedMesh = Instantiate(proBuilderShape, transform.position, Quaternion.identity);
             copiedMesh.LoadData();
         }
