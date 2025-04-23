@@ -42,98 +42,93 @@ public class EdgeVisualizer : MonoBehaviour
         }
     }
 
+    // Remap every vertex index to its shared‐group representative raw index
+    void BuildVertexToSharedGroupLookup()
+    {
+        _vertexToSharedGroup.Clear();
+        // for each shared‐vert group, pick group[0] as the rep
+        foreach (var shared in _pbMesh.sharedVertices)
+        {
+            int rep = shared[0];
+            foreach (int vi in shared)
+                _vertexToSharedGroup[vi] = rep;
+        }
+    }
+  
+    // Rebuild (and update) all edge markers
     void BuildEdgeMarkers()
     {
         if (_pbMesh == null) return;
 
-        // Step 1: Count all edges (as raw vertex index pairs)
-        Dictionary<(int, int), int> edgeCount = new();
-        foreach (Face face in _pbMesh.faces)
+        // 2a) make sure our shared‐vertex lookup is up to date
+        BuildVertexToSharedGroupLookup();
+
+        // 2b) collect ALL unique edges, as (repA,repB)
+        var uniqueEdges = new HashSet<(int, int)>();
+        foreach (var face in _pbMesh.faces)
         {
             if (face.edges.Count != 4) continue;
-
-            foreach (Edge edge in face.edges)
+            foreach (var e in face.edges)
             {
-                int a = Mathf.Min(edge.a, edge.b);
-                int b = Mathf.Max(edge.a, edge.b);
-                var key = (a, b);
-
-                if (!edgeCount.ContainsKey(key))
-                    edgeCount[key] = 1;
-                else
-                    edgeCount[key]++;
+                int repA = _vertexToSharedGroup[e.a];
+                int repB = _vertexToSharedGroup[e.b];
+                // sort so (3,7) not (7,3)
+                int a = Mathf.Min(repA, repB);
+                int b = Mathf.Max(repA, repB);
+                uniqueEdges.Add((a, b));
             }
         }
 
-        // Step 2: Place markers only on edges that appear once
-        HashSet<(int, int)> currentEdges = new();
-
-        foreach (var kvp in edgeCount)
+        // 2c) create any brand‐new edge markers
+        foreach (var edge in uniqueEdges)
         {
-            if (kvp.Value == 1)
-            {
-                (int a, int b) = kvp.Key;
-
-                if (!_edgeMarkers.ContainsKey((a, b)))
-                {
-                    CreateEdgeMarker(a, b);
-                }
-
-                currentEdges.Add((a, b));
-            }
+            if (!_edgeMarkers.ContainsKey(edge))
+                CreateEdgeMarker(edge.Item1, edge.Item2);
         }
 
-        // Step 3: Update marker positions
-        foreach ((int a, int b) in currentEdges)
+        // 2d) update positions + rotations of *all* existing markers
+        foreach (var kvp in _edgeMarkers)
         {
-            if (!_edgeMarkers.TryGetValue((a, b), out GameObject marker)) continue;
+            (int a, int b) = kvp.Key;
+            var marker = kvp.Value;
 
             Vector3 posA = _pbMesh.transform.TransformPoint(_pbMesh.positions[a]);
             Vector3 posB = _pbMesh.transform.TransformPoint(_pbMesh.positions[b]);
-            Vector3 midpoint = (posA + posB) * 0.5f;
+            Vector3 mid  = (posA + posB) * 0.5f;
 
-            if (!_lastMidpoints.ContainsKey((a, b)) || Vector3.Distance(_lastMidpoints[(a, b)], midpoint) > 0.001f)
+            // only move if it’s actually changed
+            if (!_lastMidpoints.TryGetValue(kvp.Key, out Vector3 prev) 
+                || Vector3.Distance(prev, mid) > 0.001f)
             {
-                marker.transform.position = midpoint;
+                marker.transform.position = mid;
                 marker.transform.rotation = Quaternion.LookRotation(posB - posA);
-                _lastMidpoints[(a, b)] = midpoint;
+                _lastMidpoints[kvp.Key] = mid;
             }
         }
 
-        _knownEdges = new HashSet<(int, int)>(currentEdges);
+        // 2e) if you want to remove markers on edges that went away:
+        //     var gone = _edgeMarkers.Keys.Except(uniqueEdges).ToList();
+        //     foreach(var key in gone) { Destroy(_edgeMarkers[key]); _edgeMarkers.Remove(key); }
+          
+        _knownEdges = new HashSet<(int, int)>(uniqueEdges);
     }
 
-    
-    void CreateEdgeMarker(int a, int b)
+
+    // ——— 3) Instantiate a marker for edge (repA,repB) ———
+    void CreateEdgeMarker(int repA, int repB)
     {
-        Vector3 posA = _pbMesh.transform.TransformPoint(_pbMesh.positions[a]);
-        Vector3 posB = _pbMesh.transform.TransformPoint(_pbMesh.positions[b]);
-        Vector3 midpoint = (posA + posB) * 0.5f;
-        Quaternion rotation = Quaternion.LookRotation(posB - posA);
+        Vector3 posA = _pbMesh.transform.TransformPoint(_pbMesh.positions[repA]);
+        Vector3 posB = _pbMesh.transform.TransformPoint(_pbMesh.positions[repB]);
+        Vector3 mid  = (posA + posB) * 0.5f;
+        Quaternion rot = Quaternion.LookRotation(posB - posA);
 
-        GameObject marker = Instantiate(edgePrefab, midpoint, rotation);
-        marker.name = $"Edge_{a}_{b}";
-        marker.transform.SetParent(_pbMesh.transform, true);
+        var marker = Instantiate(edgePrefab, mid, rot, _pbMesh.transform);
+        marker.name = $"Edge_{repA}_{repB}";
 
-        _edgeMarkers[(a, b)] = marker;
-        _lastMidpoints[(a, b)] = midpoint;
+        _edgeMarkers[(repA, repB)] = marker;
+        _lastMidpoints[(repA, repB)] = mid;
     }
 
-
-
-
-    
-    void BuildVertexToSharedGroupLookup()
-    {
-        _vertexToSharedGroup.Clear();
-        for (int i = 0; i < _pbMesh.sharedVertices.Count; i++)
-        {
-            foreach (int vertexIndex in _pbMesh.sharedVertices[i])
-            {
-                _vertexToSharedGroup[vertexIndex] = i;
-            }
-        }
-    }
     
     List<int> GetModifiedSharedVertexGroups()
     {
@@ -152,10 +147,8 @@ public class EdgeVisualizer : MonoBehaviour
                 _lastVertexPositions[groupIndex] = worldPos;
             }
         }
-
         return modifiedGroups;
     }
-
 
     public void ClearAll()
     {
