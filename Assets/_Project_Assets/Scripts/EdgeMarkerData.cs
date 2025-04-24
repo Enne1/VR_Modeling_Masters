@@ -8,6 +8,5 @@ public class EdgeMarkerData : MonoBehaviour
     public void setEdge(int a, int b)
     {
         edge = (a, b);
-        //Debug.Log("setEdge: " + edge);
     }
 }

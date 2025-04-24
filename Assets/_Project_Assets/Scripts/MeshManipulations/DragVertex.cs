@@ -134,8 +134,6 @@ public class DragVertex : MonoBehaviour
 
         _pbMesh.positions = newPositions;
         
-        _pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
-        
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }

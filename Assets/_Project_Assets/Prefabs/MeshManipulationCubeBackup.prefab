@@ -21,7 +21,6 @@ GameObject:
   - component: {fileID: 1404005007228594326}
   - component: {fileID: 1466907519039517711}
   - component: {fileID: 3427627455246182031}
-  - component: {fileID: 3418452356361821005}
   m_Layer: 6
   m_Name: MeshManipulationCubeBackup
   m_TagString: ProBuilderObj
@@ -458,18 +457,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6679827eac36b434f97f7dee26d18abd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3418452356361821005
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4912339518013422798}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80e4f00fbc816b44f9a0796c4c6f3603, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  tickPrefab: {fileID: 0}
-  spacing: 0.05
-  maxLength: 1.5

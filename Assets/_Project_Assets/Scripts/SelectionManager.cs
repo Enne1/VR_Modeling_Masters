@@ -29,7 +29,9 @@ public class SelectionManager : MonoBehaviour
     private string _currentSelection;
     private bool _rightTrigger;
     private List<GameObject> _selectedPadlocks;
-
+    
+    private GameObject _closestObject;
+//_pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
     private void Start()
     {
         _selectedPadlocks = new List<GameObject>();
@@ -41,7 +43,7 @@ public class SelectionManager : MonoBehaviour
             controller.position, selectionRadius, selectionMask
         );
     
-        GameObject closestObject = null;
+        _closestObject = null;
         string closestName = "";
         float closestDistance = maxSelectionDistance;
 
@@ -52,14 +54,14 @@ public class SelectionManager : MonoBehaviour
             if (distance < closestDistance)
             {
                 closestDistance = distance;
-                closestObject = hit.transform.gameObject;
+                _closestObject = hit.transform.gameObject;
                 closestName = hit.name;
             }
         }
         
-        if (closestObject != null)
+        if (_closestObject != null)
         {
-            HandleSelection(closestObject);
+            HandleSelection(_closestObject);
         }
     }
 
@@ -142,29 +144,12 @@ public class SelectionManager : MonoBehaviour
                 
                 var ring = selectedObject.transform.parent.GetComponent<LoopCuts>()?.GetRing(pbMesh, seed);
                 
-                Debug.Log("Selected Edge is: " + seed);
-                
-                foreach(var e in ring)
-                    Debug.Log($"Ring edge: {e.a}→{e.b}");
-                
-                /*
-                var edgesToConnect = new List<Edge>
-                {
-                    new Edge(2, 11),
-                    new Edge(0, 9),
-                    //new Edge(3, 7)
-                };
-                
-                
-                */
                 pbMesh.Connect(ring);
                 pbMesh.ToMesh();
                 pbMesh.Refresh();
                 
-                //static IEnumerable<Edge> GetEdgeRing(ProBuilderMesh pb, IEnumerable<Edge> edges);
-
+                selectedObject.transform.parent.GetComponent<EdgeVisualizer>()?.ReBuildEdges();
                 
-                //selectedObject.transform.parent.GetComponent<LoopCuts>().MakeLoopCut(pbMesh, seed);
                 break;
         }
     }
@@ -174,7 +159,6 @@ public class SelectionManager : MonoBehaviour
         switch (_currentSelection)
         {
             case "FaceHandle":
-                Debug.Log("Caused by face");
                 if (_rightTrigger)
                 {
                     _extrudeScript.StopDraggingFace();
@@ -192,7 +176,6 @@ public class SelectionManager : MonoBehaviour
                 break;
             case "VertexMarker":
                 _vertexDragScript.StopDraggingVertex();
-                Debug.Log("Caused by vertex");
                 _mergeScript.MergeCloseFaces();
                 break;
             case "PadlockMarker":
@@ -204,6 +187,8 @@ public class SelectionManager : MonoBehaviour
             default:
                 break;
         }
+        
+        _closestObject.transform.root.GetComponent<ProBuilderMesh>().SetPivot(_closestObject.transform.root.GetComponent<Renderer>().bounds.center);
     }
 
 

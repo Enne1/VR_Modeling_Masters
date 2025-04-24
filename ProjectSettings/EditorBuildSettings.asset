@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/_Project_Assets/Scenes/VR_Modeling.unity
     guid: 8eb9df92e4756c44cb0f1a5562382926
   - enabled: 0
-    path: Assets/_Project_Assets/Scenes/Testing_ProBuilder.unity
+    path: Assets/_Project_Assets/Scenes/Testing.unity
     guid: 550109a5510da45468aa4706f586615e
   - enabled: 0
     path: Assets/_Project_Assets/temp/New Scene.unity

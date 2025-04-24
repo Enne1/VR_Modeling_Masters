@@ -113,7 +113,6 @@ public class UndoTracker : MonoBehaviour
             .Select(sv => new SharedVertex(sv)).ToArray();
 
         // Rebuild
-        //_pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
 

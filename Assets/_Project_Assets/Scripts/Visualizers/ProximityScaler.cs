@@ -49,7 +49,7 @@ public class ProximityScaler : MonoBehaviour
             if (((1 << obj.layer) & scalableLayer) != 0)
             {
                 _scalableObjects.Add(obj.transform);
-                _originalScales[obj.transform] = Vector3.one * startScale; //_originalScales[obj.transform] = new Vector3(1, 1, 1) * startScale; // Set original scale to 1x1x1 / startScale
+                _originalScales[obj.transform] = Vector3.one * startScale;
             }
         }
     }
@@ -63,7 +63,7 @@ public class ProximityScaler : MonoBehaviour
             if (((1 << obj.layer) & scalableLayer) != 0 && !_scalableObjects.Contains(obj.transform))
             {
                 _scalableObjects.Add(obj.transform);
-                _originalScales[obj.transform] = Vector3.one * startScale;//_originalScales[obj.transform] = new Vector3(1, 1, 1) * startScale; // Set original scale to 1x1x1 / startScale
+                _originalScales[obj.transform] = Vector3.one * startScale;
             }
         }
     }

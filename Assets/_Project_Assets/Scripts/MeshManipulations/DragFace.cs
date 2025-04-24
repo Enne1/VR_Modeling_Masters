@@ -167,7 +167,6 @@ public class DragFace : MonoBehaviour
         // Assign the updated list back to the mesh.
         _pbMesh.positions = newPositions;
     
-        _pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }
