@@ -1,7 +1,7 @@
-using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.ProBuilder;
+using UnityEngine.ProBuilder.MeshOperations;
 
 public class SelectionManager : MonoBehaviour
 {
@@ -54,7 +54,6 @@ public class SelectionManager : MonoBehaviour
                 closestDistance = distance;
                 closestObject = hit.transform.gameObject;
                 closestName = hit.name;
-                
             }
         }
         
@@ -135,6 +134,38 @@ public class SelectionManager : MonoBehaviour
                     }
                 }
                 break;
+            case "LoopCutMarker":
+                var data = selectedObject.GetComponent<EdgeMarkerData>();
+                Edge seed = new Edge(data.edge.Item1, data.edge.Item2);
+                
+                var pbMesh = selectedObject.transform.parent.GetComponent<ProBuilderMesh>();
+                
+                var ring = selectedObject.transform.parent.GetComponent<LoopCuts>()?.GetRing(pbMesh, seed);
+                
+                Debug.Log("Selected Edge is: " + seed);
+                
+                foreach(var e in ring)
+                    Debug.Log($"Ring edge: {e.a}→{e.b}");
+                
+                /*
+                var edgesToConnect = new List<Edge>
+                {
+                    new Edge(2, 11),
+                    new Edge(0, 9),
+                    //new Edge(3, 7)
+                };
+                
+                
+                */
+                pbMesh.Connect(ring);
+                pbMesh.ToMesh();
+                pbMesh.Refresh();
+                
+                //static IEnumerable<Edge> GetEdgeRing(ProBuilderMesh pb, IEnumerable<Edge> edges);
+
+                
+                //selectedObject.transform.parent.GetComponent<LoopCuts>().MakeLoopCut(pbMesh, seed);
+                break;
         }
     }
 
@@ -167,6 +198,8 @@ public class SelectionManager : MonoBehaviour
             case "PadlockMarker":
                 break;
             case "FaceLocker":
+                break;
+            case "LoopCutMarker":
                 break;
             default:
                 break;

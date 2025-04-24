@@ -125,6 +125,8 @@ public class EdgeVisualizer : MonoBehaviour
         var marker = Instantiate(edgePrefab, mid, rot, _pbMesh.transform);
         marker.name = $"Edge_{repA}_{repB}";
 
+        marker.GetComponent<EdgeMarkerData>()?.setEdge(repA, repB);
+        
         _edgeMarkers[(repA, repB)] = marker;
         _lastMidpoints[(repA, repB)] = mid;
     }
@@ -157,18 +159,27 @@ public class EdgeVisualizer : MonoBehaviour
         _vertexToSharedGroup.Clear();
         _knownEdges.Clear();
 
-        List<Transform> toDestroy = new();
+        List<Transform> childrenToDestroy = new List<Transform>();
         foreach (Transform child in transform)
         {
             if (child.name.StartsWith("Edge_"))
             {
-                toDestroy.Add(child);
+                childrenToDestroy.Add(child);
             }
         }
 
-        foreach (Transform child in toDestroy)
+        foreach (var child in childrenToDestroy)
         {
             Destroy(child.gameObject);
         }
+    }
+    
+    public void ReBuildEdges()
+    {
+        if (_pbMesh == null)
+            _pbMesh = GetComponent<ProBuilderMesh>();
+
+        ClearAll();
+        BuildEdgeMarkers();
     }
 }

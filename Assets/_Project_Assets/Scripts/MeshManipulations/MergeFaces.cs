@@ -50,20 +50,18 @@ public class MergeFaces : MonoBehaviour
                     Face originalB = b;
 
                     // Save for undo
-                    //_pbMesh.GetComponent<UndoTracker>()?.SaveState();
+                    _pbMesh.GetComponent<UndoTracker>()?.SaveState();
 
                     foreach (Transform child in _pbMesh.transform)
                         Destroy(child.gameObject);
 
                     _pbMesh.GetComponent<HandleUpdater>()?.ClearAll();
                     _pbMesh.GetComponent<VertexVisualizer>()?.ClearAll();
+                    _pbMesh.GetComponent<EdgeVisualizer>()?.ClearAll();
 
                     // Weld vertices first (modifies mesh)
                     VertexEditing.WeldVertices(_pbMesh, combinedIndexes, vertexMergeThreshold);
 
-                    // Remove the exact face objects we merged
-                    //_pbMesh.faces.RemoveAll(f => f == originalA || f == originalB);
-                    
                     // Remove the exact face objects we merged
                     var newFaces = new List<Face>(_pbMesh.faces);
                     newFaces.RemoveAll(f => f == originalA || f == originalB);
@@ -75,12 +73,12 @@ public class MergeFaces : MonoBehaviour
 
                     _pbMesh.GetComponent<HandleUpdater>()?.RebuildHandles();
                     _pbMesh.GetComponent<VertexVisualizer>()?.RebuildVertices();
+                    _pbMesh.GetComponent<EdgeVisualizer>()?.ReBuildEdges();
                 }
-
             }
         }
         
-        //_pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
+        _pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
 
         _pbMesh.ToMesh();
         _pbMesh.Refresh();

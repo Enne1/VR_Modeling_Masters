@@ -28,4 +28,10 @@ public class MakeUndoCall : MonoBehaviour
         _proximityScaler.ResetScales();
         _pbMesh.GetComponent<UndoTracker>()?.Undo();
     }
+    
+    public void MakeRedo()
+    {
+        _proximityScaler.ResetScales();
+        _pbMesh.GetComponent<UndoTracker>()?.Redo();
+    }
 }

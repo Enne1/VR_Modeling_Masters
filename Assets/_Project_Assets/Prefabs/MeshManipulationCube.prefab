@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: -3797373052810387628}
   - component: {fileID: 1404005007228594326}
   - component: {fileID: 1466907519039517711}
+  - component: {fileID: 3427627455246182031}
   - component: {fileID: 3418452356361821005}
   m_Layer: 6
   m_Name: MeshManipulationCube
@@ -444,7 +445,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 080e75cfdd9567a46a7cc9e4ad5acb82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  edgePrefab: {fileID: 5997420692723999810, guid: 5464e67822d79594bbf9c6544e32aea7, type: 3}
+  edgePrefab: {fileID: 3438929280761192253, guid: e3f678a84bad9244f9a3a5f0d9a16c56, type: 3}
+--- !u!114 &3427627455246182031
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4912339518013422798}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6679827eac36b434f97f7dee26d18abd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &3418452356361821005
 MonoBehaviour:
   m_ObjectHideFlags: 0

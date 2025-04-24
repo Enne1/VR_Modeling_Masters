@@ -5,6 +5,7 @@ public class MultiSelectedList : MonoBehaviour
 {
     public List<GameObject> selectedPadlocks = new List<GameObject>();
     public List<GameObject> selectedFaces = new List<GameObject>();
+    
     public void AddToPadlockList(GameObject selectedObject)
     {
         selectedPadlocks.Add(selectedObject);
