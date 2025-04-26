@@ -25,18 +25,14 @@ public class SelectionManager : MonoBehaviour
     public GameObject mergeManager;
     private MergeFaces _mergeScript;
     
+    public GameObject proximityScaler;
+    private ProximityScaler _proximityScript;
+    
     //Private variables
     private string _currentSelection;
     private bool _rightTrigger;
-    private List<GameObject> _selectedPadlocks;
-    
     private GameObject _closestObject;
-//_pbMesh.SetPivot(_pbMesh.transform.GetComponent<Renderer>().bounds.center);
-    private void Start()
-    {
-        _selectedPadlocks = new List<GameObject>();
-    }
-
+    
     private void SelectObject(Transform controller)
     {
         Collider[] hits = Physics.OverlapSphere(
@@ -44,7 +40,6 @@ public class SelectionManager : MonoBehaviour
         );
     
         _closestObject = null;
-        string closestName = "";
         float closestDistance = maxSelectionDistance;
 
         foreach (Collider hit in hits)
@@ -55,7 +50,6 @@ public class SelectionManager : MonoBehaviour
             {
                 closestDistance = distance;
                 _closestObject = hit.transform.gameObject;
-                closestName = hit.name;
             }
         }
         
@@ -140,9 +134,12 @@ public class SelectionManager : MonoBehaviour
                 var data = selectedObject.GetComponent<EdgeMarkerData>();
                 Edge seed = new Edge(data.edge.Item1, data.edge.Item2);
                 
-                var pbMesh = selectedObject.transform.parent.GetComponent<ProBuilderMesh>();
+                var pbMesh = selectedObject.transform.root.GetComponent<ProBuilderMesh>();
                 
                 var ring = selectedObject.transform.parent.GetComponent<LoopCuts>()?.GetRing(pbMesh, seed);
+                
+                //Store current mesh state in undo Stack
+                pbMesh.GetComponent<UndoTracker>()?.SaveState();
                 
                 pbMesh.Connect(ring);
                 pbMesh.ToMesh();
@@ -187,8 +184,6 @@ public class SelectionManager : MonoBehaviour
             default:
                 break;
         }
-        
-        _closestObject.transform.root.GetComponent<ProBuilderMesh>().SetPivot(_closestObject.transform.root.GetComponent<Renderer>().bounds.center);
     }
 
 
@@ -202,6 +197,10 @@ public class SelectionManager : MonoBehaviour
     {
         _rightTrigger = true;
         StopSelection();
+        
+        // Update list of scalables for the proximity Scaler
+        _proximityScript = proximityScaler.GetComponent<ProximityScaler>();
+        _proximityScript.ResetScales();
     }
 
     public void LeftIndexTriggerDown()
@@ -214,5 +213,9 @@ public class SelectionManager : MonoBehaviour
     {
         _rightTrigger = false;
         StopSelection();
+        
+        // Update list of scalables for the proximity Scaler
+        _proximityScript = proximityScaler.GetComponent<ProximityScaler>();
+        _proximityScript.ResetScales();
     }
 }

@@ -89,7 +89,7 @@ public class GrapInteractor : MonoBehaviour
         {
             vertices[i] = center + Vector3.Scale(vertices[i] - center, scaleRatio);
         }
-
+        
         transform.localScale = targetScale;
         _pbMesh.positions = vertices;
         _pbMesh.ToMesh();

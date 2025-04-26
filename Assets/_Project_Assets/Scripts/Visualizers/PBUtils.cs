@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public static class PBUtils
 {
-    public static void NormalizeMeshSize(ProBuilderMesh pbMesh, float maxSize = 0.2f)
+    public static void NormalizeMeshSize(ProBuilderMesh pbMesh, float maxSize)
     {
         if (pbMesh == null) return;
 

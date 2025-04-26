@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ProBuilder;
+using UnityEngine.ProBuilder.MeshOperations;
 using System.Linq;
 using System.IO;
 
@@ -57,12 +58,15 @@ public class CopySaveMesh : MonoBehaviour
             
             _candidate = other.gameObject;
             
+            ProBuilderMesh otherPb = other.gameObject.GetComponent<ProBuilderMesh>();
+            otherPb.SetPivot(other.transform.GetComponent<Renderer>().bounds.center);
+            
             grabManager.GetComponent<GrapInteractor>().DetachFromController();
             other.transform.position = snapPoint.position;
+            
             PBUtils.NormalizeMeshSize(other.GetComponent<ProBuilderMesh>(), 0.1f);
             
             // Save Mesh data
-            ProBuilderMesh otherPb = other.gameObject.GetComponent<ProBuilderMesh>();
             ProBuilderMeshData data = new ProBuilderMeshData
             {
                 positions = new List<Vector3>(otherPb.positions),
@@ -127,7 +131,7 @@ public class CopySaveMesh : MonoBehaviour
         mesh.faces = loadedData.faces.Select(sf => sf.ToFace()).ToList();
         mesh.sharedVertices = loadedData.sharedVertices.Select(sv => sv.ToSharedVertex()).ToArray();
         
-        PBUtils.NormalizeMeshSize(mesh, 0.2f);
+        PBUtils.NormalizeMeshSize(mesh, 0.15f);
         
         mesh.ToMesh();
         mesh.Refresh();

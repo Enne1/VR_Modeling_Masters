@@ -8,7 +8,7 @@ public class MergeFaces : MonoBehaviour
     private ObjSelector _objSelector;
     private ProBuilderMesh _pbMesh;
     
-    public float vertexMergeThreshold = 0.001f;
+    public float vertexMergeThreshold = 0.01f;
 
     void Start()
     {
@@ -84,32 +84,41 @@ public class MergeFaces : MonoBehaviour
 
     private bool FacesCanBeMerged(Face a, Face b)
     {
-        List<Vector3> aVerts = GetWorldPositions(a);
-        List<Vector3> bVerts = GetWorldPositions(b);
+        var aDistinct = a.distinctIndexes;
+        var bDistinct = b.distinctIndexes;
 
-        int closeCount = 0;
-        foreach (var av in aVerts)
+        // make sure they have the same number of "corners"
+        if (aDistinct.Count != bDistinct.Count)
+            return false;
+
+        // work in squared units to avoid repeated sqrt
+        float thrSqr = vertexMergeThreshold * vertexMergeThreshold;
+
+        // for each corner on A, find a partner on B
+        foreach (int ai in aDistinct)
         {
-            foreach (var bv in bVerts)
+            Vector3 worldA = _pbMesh.transform.TransformPoint(_pbMesh.positions[ai]);
+            bool found = false;
+
+            foreach (int bi in bDistinct)
             {
-                if (Vector3.Distance(av, bv) < vertexMergeThreshold)
+                Vector3 worldB = _pbMesh.transform.TransformPoint(_pbMesh.positions[bi]);
+                float distSqr = (worldA - worldB).sqrMagnitude;
+
+                if (distSqr <= thrSqr)
                 {
-                    closeCount++;
+                    found = true;
                     break;
                 }
             }
+
+            if (!found)
+            {
+                return false;
+            }
         }
 
-        return closeCount >= 4;
-    }
-
-    private List<Vector3> GetWorldPositions(Face face)
-    {
-        List<Vector3> verts = new List<Vector3>();
-        foreach (int i in face.indexes)
-        {
-            verts.Add(_pbMesh.transform.TransformPoint(_pbMesh.positions[i]));
-        }
-        return verts;
+        // all corners matched
+        return true;
     }
 } 

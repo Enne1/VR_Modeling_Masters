@@ -109,7 +109,7 @@ public class ExtrudeFeature : MonoBehaviour
     {
         if (totalDraggedDistance < 0.01f)
         {
-            _pbMesh.GetComponent<UndoTracker>()?.Undo();
+            _pbMesh.GetComponent<UndoTracker>()?.Undo(true);
         }
         _isDragging = false;
         _selectedFace = null;

@@ -3,104 +3,98 @@ using UnityEngine;
 
 public class ProximityScaler : MonoBehaviour
 {
-    public Transform leftController;
-    public Transform rightController;
-    public LayerMask scalableLayer;
-    public float minDistance = 0.2f;
-    public float maxDistance = 3.0f;
-    public float startScale = 0.02f;
-    
-    private List<Transform> _scalableObjects = new List<Transform>();
-    private Dictionary<Transform, Vector3> _originalScales = new Dictionary<Transform, Vector3>();
-    private GameObject _currObj;
+    [SerializeField] Transform leftController;
+    [SerializeField] Transform rightController;
+    [SerializeField] LayerMask scalableLayer;
+    [SerializeField] float minDistance = 0.2f;
+    [SerializeField] float maxDistance = 3.0f;
+    [SerializeField] float startScale = 0.02f;
+
+    GameObject _currObj;
+    List<Transform> _scalable = new List<Transform>();
+    HashSet<Transform> _scalableSet = new HashSet<Transform>();
+    Dictionary<Transform, Vector3> _originalScale = new Dictionary<Transform, Vector3>();
+    float _invRange;
+
+    void Awake()
+    {
+        // Precompute inverse distance range
+        _invRange = 1f / (maxDistance - minDistance);
+    }
+
+    public void SetScales(GameObject pbObj)
+    {
+        Debug.Log("Updating scales");
+        _currObj = pbObj;
+        InitializeSignifiers();
+    }
 
     public void ResetScales()
     {
-        _scalableObjects.Clear();
-        _originalScales.Clear();
-        FindScalableObjects();
+        InitializeSignifiers();
     }
-    
-    public void SetScales(GameObject pbObj)
+
+    void InitializeSignifiers()
     {
-        _currObj = pbObj;
-        _scalableObjects.Clear();
-        _originalScales.Clear();
-        FindScalableObjects();
+        _scalable.Clear();
+        _scalableSet.Clear();
+        _originalScale.Clear();
+
+        Debug.Log("_scalable: " + _scalable.Count);
+        Debug.Log("_scalableSet: " + _scalableSet.Count);
+        Debug.Log("_originalScale: " + _originalScale.Count);
+        Debug.Log("Obj: " + _currObj);
+        
+        if (_currObj == null) return;
+
+        // Find only the children of the current object on the scalable layer
+        foreach (var t in _currObj.GetComponentsInChildren<Transform>(true))
+        {
+            if (((1 << t.gameObject.layer) & scalableLayer) != 0)
+            {
+                _scalable.Add(t);
+                _scalableSet.Add(t);
+                _originalScale[t] = Vector3.one * startScale;
+            }
+        }
     }
 
     void Update()
     {
-        if (_currObj == null) // Works even if pbObj was destroyed in another script
-        {
-            return;
-        }
-        
-        UpdateScalableObjects();
-        ScaleObjects();
+        if (_currObj == null) return;
+        ScaleSignifiers();
+        //Debug.Log("Update");
     }
 
-    void FindScalableObjects()
+    void ScaleSignifiers()
     {
-        GameObject[] objects = GameObject.FindObjectsOfType<GameObject>();
-        
-        foreach (GameObject obj in objects)
-        {
-            if (((1 << obj.layer) & scalableLayer) != 0)
-            {
-                _scalableObjects.Add(obj.transform);
-                _originalScales[obj.transform] = Vector3.one * startScale;
-            }
-        }
-    }
+        Vector3 lp = leftController.position;
+        Vector3 rp = rightController.position;
 
-    void UpdateScalableObjects()
-    {
-        GameObject[] objects = GameObject.FindObjectsOfType<GameObject>();
-        
-        foreach (GameObject obj in objects)
+        for (int i = 0, n = _scalable.Count; i < n; i++)
         {
-            if (((1 << obj.layer) & scalableLayer) != 0 && !_scalableObjects.Contains(obj.transform))
-            {
-                _scalableObjects.Add(obj.transform);
-                _originalScales[obj.transform] = Vector3.one * startScale;
-            }
+            var t = _scalable[i];
+            if (t == null || ParentIsScaled(t)) continue;
+
+            // single sqrt instead of two Distance() calls
+            float sqrD1 = (t.position - lp).sqrMagnitude;
+            float sqrD2 = (t.position - rp).sqrMagnitude;
+            float d = Mathf.Sqrt(Mathf.Min(sqrD1, sqrD2));
+
+            float norm = Mathf.Clamp01((d - minDistance) * _invRange);
+
+            Vector3 maxS = _originalScale[t];
+            Vector3 minS = maxS * 0.1f;
+            t.localScale = Vector3.Lerp(maxS, minS, norm);
         }
     }
 
-    void ScaleObjects()
+    bool ParentIsScaled(Transform t)
     {
-        foreach (Transform obj in _scalableObjects)
-        {
-            if (obj == null) continue;
-            
-            if (IsParentScalable(obj))
-                continue; // Skip scaling if the parent is already being scaled
-            
-            float distanceToController1 = Vector3.Distance(obj.position, leftController.position);
-            float distanceToController2 = Vector3.Distance(obj.position, rightController.position);
-            float closestDistance = Mathf.Min(distanceToController1, distanceToController2);
-
-            float normalizedDistance = Mathf.Clamp01((closestDistance - minDistance) / (maxDistance - minDistance));
-            Vector3 maxScale = _originalScales[obj];// * startScale;
-            Vector3 minScale = maxScale * 0.1f; // 10% of original scale
-            obj.localScale = Vector3.Lerp(maxScale, minScale, normalizedDistance);
-        }
-    }
-    
-    bool IsParentScalable(Transform obj)
-    {
-        if (obj == null) return false;
-        
-        Transform parent = obj.parent;
-        while (parent != null)
-        {
-            if (_scalableObjects.Contains(parent))
-            {
+        // fast O(1) check via HashSet
+        for (var p = t.parent; p != null; p = p.parent)
+            if (_scalableSet.Contains(p))
                 return true;
-            }
-            parent = parent.parent;
-        }
         return false;
     }
 }

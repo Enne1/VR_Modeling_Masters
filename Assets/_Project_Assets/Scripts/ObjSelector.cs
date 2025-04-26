@@ -63,7 +63,6 @@ public class ObjSelector : MonoBehaviour
                 ClosestObj = hit.transform.gameObject;
             }
         }
-
         
         _proximityScaler = proximityScalerManager.GetComponent<ProximityScaler>();
         _proximityScaler.SetScales(ClosestObj);
