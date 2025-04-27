@@ -39,11 +39,6 @@ public class ProximityScaler : MonoBehaviour
         _scalable.Clear();
         _scalableSet.Clear();
         _originalScale.Clear();
-
-        Debug.Log("_scalable: " + _scalable.Count);
-        Debug.Log("_scalableSet: " + _scalableSet.Count);
-        Debug.Log("_originalScale: " + _originalScale.Count);
-        Debug.Log("Obj: " + _currObj);
         
         if (_currObj == null) return;
 
