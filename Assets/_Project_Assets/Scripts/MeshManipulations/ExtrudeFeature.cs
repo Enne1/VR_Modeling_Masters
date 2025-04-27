@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
-using UnityEngine.UIElements;
+using System.Linq;
 
 public class ExtrudeFeature : MonoBehaviour
 {
@@ -27,6 +27,17 @@ public class ExtrudeFeature : MonoBehaviour
     // Public variables
     public GameObject rightController;
     public float minExtrudeDistance;
+    
+    
+    [Header("Ruler Settings")]
+    public GameObject tickPrefab;       // assign in inspector
+    public float tickSpacing = 0.01f;   // 1cm spacing
+
+    // internal tracking of the extrusion
+    private Face[]     _extrudedFaces;
+    private List<GameObject> _rulerTicks = new List<GameObject>();
+    private HashSet<Face> _originalFaces;
+    
     
     void Start()
     {
@@ -107,10 +118,17 @@ public class ExtrudeFeature : MonoBehaviour
     // Reset variables when stopping the extrusion.
     public void StopDraggingFace()
     {
+        // Abort extrusion if it is too small
         if (totalDraggedDistance < 0.01f)
         {
             _pbMesh.GetComponent<UndoTracker>()?.Undo(true);
         }
+        
+        // Reset parameters
+        foreach (var t in _rulerTicks)
+            Destroy(t);
+        _rulerTicks.Clear();
+        
         _isDragging = false;
         _selectedFace = null;
         _dragAlongFaces.Clear();
@@ -150,6 +168,8 @@ public class ExtrudeFeature : MonoBehaviour
         _pbMesh.Refresh();
 
         totalDraggedDistance = finalMovement.magnitude;
+        
+        //UpdateRulerTicks();
     }
     
     // Called when the right index trigger is pressed to begin extrusion.
@@ -183,8 +203,13 @@ public class ExtrudeFeature : MonoBehaviour
             //Store current mesh state in undo Stack
             _pbMesh.GetComponent<UndoTracker>()?.SaveState();
             
+            // Store Edges before Extrusion (Used for finding edges for tick marks)
+            _originalFaces = new HashSet<Face>();
+            foreach (var face in _pbMesh.faces)
+                _originalFaces.Add(face);
+            
             // Extrude all the selected faces simultaneously by a small initial amount.
-            _pbMesh.Extrude(facesToExtrude, ExtrudeMethod.FaceNormal, .001f);
+            _extrudedFaces = _pbMesh.Extrude(facesToExtrude, ExtrudeMethod.FaceNormal, .001f);
             _pbMesh.ToMesh();
             _pbMesh.Refresh();
             
@@ -255,5 +280,101 @@ public class ExtrudeFeature : MonoBehaviour
             sum += _pbMesh.transform.TransformPoint(_pbMesh.positions[index]);
         }
         return sum / count;
+    }
+    
+    void UpdateRulerTicks()
+    {
+        // clear out the old ticks
+        foreach (var t in _rulerTicks)
+            Destroy(t);
+        _rulerTicks.Clear();
+
+        if (_extrudedFaces == null || _originalFaces == null || tickPrefab == null)
+            return;
+
+        // gather *all* edges from the faces ProBuilder just gave you
+        var newFaces = new HashSet<Face>();
+        foreach (var face in _extrudedFaces)
+            newFaces.Add(face);
+
+        // remove any edge that already existed in the mesh
+        newFaces.ExceptWith(_originalFaces);
+        
+        Debug.Log("Original Face count: " + _originalFaces.Count);
+        Debug.Log("New Face count: " + newFaces.Count);
+        
+        Debug.Log($"I have {newFaces.Count} faces:");
+        foreach(var f in newFaces)
+            Debug.Log($"face has {f.edges.Count} edges");
+        
+        List<Edge> newEdges = GetSharedEdgesBetweenFaces(newFaces);
+        
+        Debug.Log("New Edges: " + newEdges.Count);
+        
+        // now sample only the truly new edges
+        foreach (var edge in newEdges)
+        {
+            Vector3 pA = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.a]);
+            Vector3 pB = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.b]);
+            float length = Vector3.Distance(pA, pB);
+            int   count  = Mathf.FloorToInt(length / tickSpacing);
+            Debug.Log("New Edge Count: " + count);
+            for (int i = 0; i <= count; i++)
+            {
+                float    t   = (tickSpacing * i) / length;
+                Vector3 pos  = Vector3.Lerp(pA, pB, t);
+                var      tick = Instantiate(tickPrefab, pos, Quaternion.identity, transform);
+                _rulerTicks.Add(tick);
+            }
+        }
+    }
+
+    List<Edge> GetSharedEdgesBetweenFaces(HashSet<Face> newFaces)
+    {
+        // 1) Build a map: vertexIndex -> set of faces in newFaces
+        var vertexFaceMap = new Dictionary<int, HashSet<Face>>();
+        foreach (var face in newFaces)
+        {
+            // use distinctIndexes to avoid duplicates if it's a triangle fan etc.
+            foreach (int vi in face.distinctIndexes)
+            {
+                if (!vertexFaceMap.TryGetValue(vi, out var faceSet))
+                {
+                    faceSet = new HashSet<Face>();
+                    vertexFaceMap[vi] = faceSet;
+                }
+                faceSet.Add(face);
+            }
+        }
+
+        // 2) Find all pairs of vertices whose face‐sets are identical (and size == 2)
+        //    Those two vertices must share exactly those two faces → they form an edge
+        var newEdges = new List<Edge>();
+        var seen     = new HashSet<(int a, int b)>();
+        var verts    = new List<int>(vertexFaceMap.Keys);
+
+        for (int i = 0; i < verts.Count; i++)
+        for (int j = i + 1; j < verts.Count; j++)
+        {
+            int vi = verts[i], vj = verts[j];
+            var setI = vertexFaceMap[vi];
+            var setJ = vertexFaceMap[vj];
+
+            // they must belong to the same two faces
+            if (setI.Count == 2 &&
+                setJ.Count == 2 &&
+                setI.SetEquals(setJ))
+            {
+                // normalize the pair so (3,7) and (7,3) aren't duplicated
+                int a = Mathf.Min(vi, vj);
+                int b = Mathf.Max(vi, vj);
+                if (seen.Add((a, b)))
+                {
+                    newEdges.Add(new Edge(a, b));
+                }
+            }
+        }
+
+        return newEdges;
     }
 }

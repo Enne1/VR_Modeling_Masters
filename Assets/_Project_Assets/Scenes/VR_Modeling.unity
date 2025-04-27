@@ -17044,8 +17044,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightController: {fileID: 29748419}
   minExtrudeDistance: 0.2
-  markerPrefab: {fileID: 7893131240257742651, guid: b8a32004f5daf53478f156b8ed955f39, type: 3}
-  markerSpacing: 0.01
+  tickPrefab: {fileID: 7893131240257742651, guid: b8a32004f5daf53478f156b8ed955f39, type: 3}
+  tickSpacing: 0.01
 --- !u!1 &1288689946
 GameObject:
   m_ObjectHideFlags: 0
