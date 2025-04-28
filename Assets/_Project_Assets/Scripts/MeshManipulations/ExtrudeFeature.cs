@@ -9,7 +9,7 @@ public class ExtrudeFeature : MonoBehaviour
     // Private variables needed for extrusion
     private ObjSelector _objSelector;
     private ProBuilderMesh _pbMesh;
-    // _selectedFace will be the primary (first) face—now, always the face under the controller.
+    // _selectedFace will be the primary (first) face, always the face under the controller.
     private Face _selectedFace;
     // Additional faces that are extruded.
     private List<Face> _dragAlongFaces = new List<Face>(); 
@@ -28,15 +28,15 @@ public class ExtrudeFeature : MonoBehaviour
     public GameObject rightController;
     public float minExtrudeDistance;
     
-    
-    [Header("Ruler Settings")]
+    //Ruler settings
     public GameObject tickPrefab;       // assign in inspector
     public float tickSpacing = 0.01f;   // 1cm spacing
 
     // internal tracking of the extrusion
-    private Face[]     _extrudedFaces;
     private List<GameObject> _rulerTicks = new List<GameObject>();
+    private Face[] _extrudedFaces;
     private HashSet<Face> _originalFaces;
+    private HashSet<Edge> _sideWallEdges;
     
     
     void Start()
@@ -169,11 +169,11 @@ public class ExtrudeFeature : MonoBehaviour
 
         totalDraggedDistance = finalMovement.magnitude;
         
-        //UpdateRulerTicks();
+        UpdateRulerTicks();
     }
     
     // Called when the right index trigger is pressed to begin extrusion.
-    public void CallExtrution()
+    public void CallExtrusion()
     {
         List<Face> facesToExtrude = new List<Face>();
         
@@ -212,6 +212,9 @@ public class ExtrudeFeature : MonoBehaviour
             _extrudedFaces = _pbMesh.Extrude(facesToExtrude, ExtrudeMethod.FaceNormal, .001f);
             _pbMesh.ToMesh();
             _pbMesh.Refresh();
+
+            _sideWallEdges = CalculateSidewallEdges();
+            Debug.Log("Side walls: " + _sideWallEdges.Count);
             
             // Set the primary face (first in the list) and record the others.
             _selectedFace = facesToExtrude[0];
@@ -292,33 +295,15 @@ public class ExtrudeFeature : MonoBehaviour
         if (_extrudedFaces == null || _originalFaces == null || tickPrefab == null)
             return;
 
-        // gather *all* edges from the faces ProBuilder just gave you
-        var newFaces = new HashSet<Face>();
-        foreach (var face in _extrudedFaces)
-            newFaces.Add(face);
-
-        // remove any edge that already existed in the mesh
-        newFaces.ExceptWith(_originalFaces);
-        
-        Debug.Log("Original Face count: " + _originalFaces.Count);
-        Debug.Log("New Face count: " + newFaces.Count);
-        
-        Debug.Log($"I have {newFaces.Count} faces:");
-        foreach(var f in newFaces)
-            Debug.Log($"face has {f.edges.Count} edges");
-        
-        List<Edge> newEdges = GetSharedEdgesBetweenFaces(newFaces);
-        
-        Debug.Log("New Edges: " + newEdges.Count);
         
         // now sample only the truly new edges
-        foreach (var edge in newEdges)
+        foreach (var edge in _sideWallEdges)
         {
             Vector3 pA = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.a]);
             Vector3 pB = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.b]);
             float length = Vector3.Distance(pA, pB);
             int   count  = Mathf.FloorToInt(length / tickSpacing);
-            Debug.Log("New Edge Count: " + count);
+            
             for (int i = 0; i <= count; i++)
             {
                 float    t   = (tickSpacing * i) / length;
@@ -329,6 +314,102 @@ public class ExtrudeFeature : MonoBehaviour
         }
     }
 
+
+    HashSet<Edge> CalculateSidewallEdges()
+    {
+        
+        // gather *all* edges from the faces ProBuilder just gave you
+        var newFaces = new HashSet<Face>();
+        foreach (var face in _extrudedFaces)
+            newFaces.Add(face);
+
+        // remove any edge that already existed in the mesh
+        newFaces.ExceptWith(_originalFaces);
+
+    // Step 1: Collect vertex indices from provided faces
+    HashSet<int> faceVertexIndices = new HashSet<int>();
+    foreach (var face in newFaces)
+    {
+        foreach (var idx in face.distinctIndexes)
+            faceVertexIndices.Add(idx);
+    }
+
+    // Step 2: Group vertices by position (within a small tolerance)
+    Dictionary<Vector3, List<int>> positionToVertices = new Dictionary<Vector3, List<int>>();
+    float threshold = 0.0001f;
+
+    foreach (int idx in faceVertexIndices)
+    {
+        Vector3 pos = _pbMesh.positions[idx];
+        bool found = false;
+
+        // Find existing key within threshold
+        foreach (var key in positionToVertices.Keys)
+        {
+            if (Vector3.Distance(key, pos) <= threshold)
+            {
+                positionToVertices[key].Add(idx);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            positionToVertices[pos] = new List<int> { idx };
+        }
+    }
+
+    // Step 3: Create vertex-to-sharedVertex mapping
+    Dictionary<int, int> vertexToShared = new Dictionary<int, int>();
+    int sharedIdx = 0;
+    foreach (var group in positionToVertices.Values)
+    {
+        foreach (int vertIdx in group)
+        {
+            vertexToShared[vertIdx] = sharedIdx;
+        }
+        sharedIdx++;
+    }
+
+    // Step 4: Count occurrences of edges between faces using shared vertices
+    Dictionary<(int, int), int> sharedEdgeCount = new Dictionary<(int, int), int>();
+
+    foreach (Face face in newFaces)
+    {
+        foreach (Edge edge in face.edges)
+        {
+            int sharedA = vertexToShared[edge.a];
+            int sharedB = vertexToShared[edge.b];
+
+            var orderedEdge = sharedA < sharedB ? (sharedA, sharedB) : (sharedB, sharedA);
+
+            if (sharedEdgeCount.ContainsKey(orderedEdge))
+                sharedEdgeCount[orderedEdge]++;
+            else
+                sharedEdgeCount[orderedEdge] = 1;
+        }
+    }
+
+    // Step 5: Find edges appearing exactly twice (connecting two faces)
+    HashSet<Edge> connectingEdges = new HashSet<Edge>();
+    foreach (var kvp in sharedEdgeCount)
+    {
+        if (kvp.Value == 2)
+        {
+            // Get actual vertex indices for representation
+            var verticesA = positionToVertices.Values.ElementAt(kvp.Key.Item1);
+            var verticesB = positionToVertices.Values.ElementAt(kvp.Key.Item2);
+
+            Edge actualEdge = new Edge(verticesA[0], verticesB[0]);
+            connectingEdges.Add(actualEdge);
+        }
+    }
+
+    return connectingEdges;
+}
+    
+    
     List<Edge> GetSharedEdgesBetweenFaces(HashSet<Face> newFaces)
     {
         // 1) Build a map: vertexIndex -> set of faces in newFaces

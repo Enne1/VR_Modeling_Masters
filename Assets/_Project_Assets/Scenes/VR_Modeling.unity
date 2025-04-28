@@ -20379,7 +20379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftController: {fileID: 651223789}
   minDragDistance: 0.2
-  normalAxisMaterial: {fileID: 2100000, guid: f74daa0c40e5dd148b8d657520832a38, type: 2}
+  normalAxisMaterial: {fileID: 2100000, guid: b796f39d0ed7e904cba7afa247a1fe2f, type: 2}
 --- !u!1 &1485071592
 GameObject:
   m_ObjectHideFlags: 0

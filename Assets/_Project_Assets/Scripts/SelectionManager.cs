@@ -70,7 +70,7 @@ public class SelectionManager : MonoBehaviour
                 if (_rightTrigger)
                 {
                     _extrudeScript = extrudeManager.GetComponent<ExtrudeFeature>();
-                    _extrudeScript.CallExtrution();
+                    _extrudeScript.CallExtrusion();
                 }
                 else
                 {
@@ -187,35 +187,54 @@ public class SelectionManager : MonoBehaviour
     }
 
 
+    private bool _rightIsActive;
+    private bool _leftIsActive;
+    
     public void RightIndexTriggerDown()
     {
-        _rightTrigger = true;
-        SelectObject(rightController);
+        if (!_leftIsActive)
+        {
+            _rightTrigger = true;
+            _rightIsActive = true;
+            SelectObject(rightController);
+        }
     }
 
     public void RightIndexTriggerUp()
     {
-        _rightTrigger = true;
-        StopSelection();
+        if (!_leftIsActive)
+        {
+            _rightTrigger = true;
+            _rightIsActive = false;
+            StopSelection();
         
-        // Update list of scalables for the proximity Scaler
-        _proximityScript = proximityScaler.GetComponent<ProximityScaler>();
-        _proximityScript.ResetScales();
+            // Update list of scalables for the proximity Scaler
+            _proximityScript = proximityScaler.GetComponent<ProximityScaler>();
+            _proximityScript.ResetScales();
+        }
     }
 
     public void LeftIndexTriggerDown()
     {
-        _rightTrigger = false;
-        SelectObject(leftController);
+        if (!_rightIsActive)
+        {
+            _rightTrigger = false;
+            _leftIsActive = true;
+            SelectObject(leftController);
+        }
     }
 
     public void LeftIndexTriggerUp()
     {
-        _rightTrigger = false;
-        StopSelection();
+        if (!_rightIsActive)
+        {
+            _rightTrigger = false;
+            _leftIsActive = false;
+            StopSelection();
         
-        // Update list of scalables for the proximity Scaler
-        _proximityScript = proximityScaler.GetComponent<ProximityScaler>();
-        _proximityScript.ResetScales();
+            // Update list of scalables for the proximity Scaler
+            _proximityScript = proximityScaler.GetComponent<ProximityScaler>();
+            _proximityScript.ResetScales();
+        }
     }
 }
