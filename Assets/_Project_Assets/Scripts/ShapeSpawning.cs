@@ -8,7 +8,7 @@ public class ShapeSpawning : MonoBehaviour
     public float spawnRadius;
     public LayerMask detectionLayer; 
 
-    // Spawn an initial shape on the spawner petistal
+    // Spawn an initial shape on the spawner pedestal
     private void Start()
     {
         if(proBuilderShape == null)
@@ -17,7 +17,7 @@ public class ShapeSpawning : MonoBehaviour
         Instantiate(proBuilderShape, transform.position, Quaternion.identity);
     }
 
-    // When the shape is removed from the petistal, generate a new one
+    // When the shape is removed from the pedestal, generate a new one
     // If a shape exists within the "Physics.CheckSphere" don't add a new one
     private void Update()
     {

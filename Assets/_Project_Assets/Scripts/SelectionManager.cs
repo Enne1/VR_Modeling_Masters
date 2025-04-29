@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
@@ -33,15 +32,20 @@ public class SelectionManager : MonoBehaviour
     private bool _rightTrigger;
     private GameObject _closestObject;
     
+    /// <summary>
+    /// Finds the closest signifier to the controller when either the left or right trigger is pressed
+    /// </summary>
     private void SelectObject(Transform controller)
     {
+        // Lists all signifiers within the shpere of selection
         Collider[] hits = Physics.OverlapSphere(
             controller.position, selectionRadius, selectionMask
         );
     
         _closestObject = null;
         float closestDistance = maxSelectionDistance;
-
+        
+        // Finds which signifier is closest to the controller
         foreach (Collider hit in hits)
         {
             float distance = Vector3.Distance(controller.position, hit.transform.position);
@@ -49,29 +53,37 @@ public class SelectionManager : MonoBehaviour
             if (distance < closestDistance)
             {
                 closestDistance = distance;
+                // store the closest signifier
                 _closestObject = hit.transform.gameObject;
             }
         }
         
+        // if a signifier is found, use that for further operations
         if (_closestObject != null)
         {
             HandleSelection(_closestObject);
         }
     }
 
+    /// <summary>
+    /// Figures out which type of signifier was selected, and applies appropriate operations with that signifier
+    /// </summary>
     private void HandleSelection(GameObject selectedObject)
     {
         _currentSelection = selectedObject.tag;
         
+        // look for which signifier type was selected
         switch (selectedObject.tag)
         {
+            // Case: the closest signifier is a handle
             case "FaceHandle":
-                //selectedObject.GetComponent<MeshRenderer>().material = sMat;
+                // If right hand controller was used to select, run Extrusion
                 if (_rightTrigger)
                 {
                     _extrudeScript = extrudeManager.GetComponent<ExtrudeFeature>();
                     _extrudeScript.CallExtrusion();
                 }
+                // If left hand controller was used to select, run Dragging
                 else
                 {
                     _dragScript = dragManager.GetComponent<DragFace>();
@@ -79,7 +91,9 @@ public class SelectionManager : MonoBehaviour
                 }
                 break;
 
+            // Case: the closest signifier is a Vertex
             case "VertexMarker":
+                // Start vertex dragging based on which controller is used
                 if (_rightTrigger)
                 {
                     _vertexDragScript = vertexDragManager.GetComponent<DragVertex>();
@@ -92,8 +106,9 @@ public class SelectionManager : MonoBehaviour
                 }
                 break;
 
+            // Case: the closest signifier is a padlock
             case "PadlockMarker":
-                // Check if the PadlockToggler component is attached
+                // toggle the padlock (select or unselect)
                 MultiSelectionToggler padlockToggler = selectedObject.GetComponent<MultiSelectionToggler>();
                 MultiSelectedList padlockSelectedList = selectedObject.transform.parent.parent.GetComponent<MultiSelectedList>();
                 if (padlockToggler != null)
@@ -111,8 +126,10 @@ public class SelectionManager : MonoBehaviour
                     }
                 }
                 break;
+            
+            // Case: the closest signifier is a face chain
             case "FaceLocker":
-                // Check if the fac lockToggler component is attached
+                // toggle the chain (select or unselect)
                 MultiSelectionToggler faceLockToggler = selectedObject.GetComponent<MultiSelectionToggler>();
                 MultiSelectedList facesSelectedList = selectedObject.transform.parent.parent.GetComponent<MultiSelectedList>();
                 if (faceLockToggler != null)
@@ -130,48 +147,61 @@ public class SelectionManager : MonoBehaviour
                     }
                 }
                 break;
+            
+            // Case: the closest signifier is an edge loopcut
             case "LoopCutMarker":
+                // get the edge value attached to the signifier
                 var data = selectedObject.GetComponent<EdgeMarkerData>();
                 Edge seed = new Edge(data.edge.Item1, data.edge.Item2);
                 
+                // get the selected ProBuilder mesh, and find a ring of edges, based of the seed edge
                 var pbMesh = selectedObject.transform.root.GetComponent<ProBuilderMesh>();
-                
                 var ring = selectedObject.transform.parent.GetComponent<LoopCuts>()?.GetRing(pbMesh, seed);
                 
                 //Store current mesh state in undo Stack
                 pbMesh.GetComponent<UndoTracker>()?.SaveState();
-                
+
+                // Connect the list of edges in the ring
                 pbMesh.Connect(ring);
                 pbMesh.ToMesh();
                 pbMesh.Refresh();
                 
+                // Rebuild signifiers
                 selectedObject.transform.parent.GetComponent<EdgeVisualizer>()?.ReBuildEdges();
                 
                 break;
         }
     }
 
+    // Stop a signifier selection when trigger button is released
     void StopSelection()
     {
         switch (_currentSelection)
         {
+            // Case: the closest signifier is a Handle
             case "FaceHandle":
+                // If right hand controller was used to select, stop Extrusion
                 if (_rightTrigger)
                 {
                     _extrudeScript.StopDraggingFace();
                     
+                    // Check if faces can be merged
                     _mergeScript = mergeManager.GetComponent<MergeFaces>();
                     _mergeScript.MergeCloseFaces();
                 }
+                // If left hand controller was used to select, stop Dragging
                 else
                 {
                     _dragScript.StopDraggingFace();
                     
+                    // Check if faces can be merged
                     _mergeScript = mergeManager.GetComponent<MergeFaces>();
                     _mergeScript.MergeCloseFaces();
                 }
                 break;
+            // Case: the closest signifier is a vertex
             case "VertexMarker":
+                // Stop dragging the vertex
                 _vertexDragScript.StopDraggingVertex();
                 _mergeScript.MergeCloseFaces();
                 break;
@@ -189,7 +219,8 @@ public class SelectionManager : MonoBehaviour
 
     private bool _rightIsActive;
     private bool _leftIsActive;
-    
+
+    // right trigger is pressed down
     public void RightIndexTriggerDown()
     {
         if (!_leftIsActive)
@@ -200,6 +231,7 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
+    // right trigger is released
     public void RightIndexTriggerUp()
     {
         if (!_leftIsActive)
@@ -214,6 +246,7 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
+    // left trigger is pressed down
     public void LeftIndexTriggerDown()
     {
         if (!_rightIsActive)
@@ -224,6 +257,7 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
+    // left trigger is released
     public void LeftIndexTriggerUp()
     {
         if (!_rightIsActive)

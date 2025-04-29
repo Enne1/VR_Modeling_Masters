@@ -8,7 +8,7 @@ public class ShapeCopying : MonoBehaviour
     public LayerMask detectionLayer; 
 
     /// <summary>
-    /// Spawn an initial shape on the spawner petistal
+    /// Spawn an initial shape on the copy pedestal, if mesh data is saved 
     /// </summary>
     private void Start()
     {
@@ -19,7 +19,7 @@ public class ShapeCopying : MonoBehaviour
     }
 
     /// <summary>
-    /// When the shape is removed from the petistal, generate a new one
+    /// When the shape is removed from the pedestal, generate a new one
     /// If a shape exists within the "Physics.CheckSphere" don't add a new one
     /// </summary>
     private void Update()
@@ -32,6 +32,8 @@ public class ShapeCopying : MonoBehaviour
         {
             var copiedMesh = copyPlayform.GetComponent<CopySaveMesh>();
             copiedMesh.copiedMesh = Instantiate(proBuilderShape, transform.position, Quaternion.identity);
+            
+            // Apply mesh data to the newly instantiated mesh
             copiedMesh.LoadData();
         }
     }

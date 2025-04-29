@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.ProBuilder;
-using UnityEngine.ProBuilder.MeshOperations;
 
 public class ObjSelector : MonoBehaviour
 {
@@ -23,10 +21,11 @@ public class ObjSelector : MonoBehaviour
     /// </summary>
     public void SelectObj()
     {
-        _pbObjectsInScene = GameObject.FindGameObjectsWithTag("ProBuilderObj"); // Find all objects with the tag
+        _pbObjectsInScene = GameObject.FindGameObjectsWithTag("ProBuilderObj");
+        
+        // make sure all ProBuilder objects in the scene are disabled
         foreach (GameObject pb in _pbObjectsInScene)
         {
-            // Set all objects to the deselected material
             MeshRenderer renderer = pb.GetComponent<MeshRenderer>();
             
             if (renderer != null)
@@ -39,6 +38,7 @@ public class ObjSelector : MonoBehaviour
             }
         }
         
+        // find all ProBuilder objects within a certain radius of the controller, when selection button is pressed
         Collider[] hits = Physics.OverlapSphere(
             leftController.transform.position, selectionRadius, selectionMask
         );
@@ -46,6 +46,7 @@ public class ObjSelector : MonoBehaviour
         ClosestObj = null;
         float closestDistance = selectionRadius;
 
+        // Find the closest object to the controller within the selection sphere
         foreach (Collider hit in hits)
         {
             // Find the closest point on the collider's surface
@@ -57,14 +58,16 @@ public class ObjSelector : MonoBehaviour
             if (distance < closestDistance)
             {
                 closestDistance = distance;
+                //Store the closest object
                 ClosestObj = hit.transform.gameObject;
             }
         }
         
+        // Initiate ProximityScaler for the closest object
         _proximityScaler = proximityScalerManager.GetComponent<ProximityScaler>();
         _proximityScaler.SetScales(ClosestObj);
         
-        // Set the closest object to the selected material
+        // Set the closest object to the selected material and enable its signifiers
         if (ClosestObj != null)
         {
             foreach( Transform child in ClosestObj.transform)
