@@ -7,7 +7,7 @@ using UnityEngine.ProBuilder.MeshOperations;
 
 public class LoopCuts : MonoBehaviour
 {
-    // 1) Cache the internal GetEdgeRing method (non-public, static)
+    // Cache ProBuilders internal GetEdgeRing method (non-public, static)
     static readonly MethodInfo s_GetEdgeRing = typeof(ElementSelection)
         .GetMethod("GetEdgeRing",
             BindingFlags.NonPublic | BindingFlags.Static,
@@ -16,7 +16,7 @@ public class LoopCuts : MonoBehaviour
             null);
 
     /// <summary>
-    /// Returns the “edge ring” for your seed edge (the same ring you’d get in the editor via Alt+R). 
+    /// Returns the “edge ring” for the seed edge.
     /// </summary>
     public IEnumerable<Edge> GetRing(ProBuilderMesh mesh, Edge seed)
     {
@@ -24,7 +24,7 @@ public class LoopCuts : MonoBehaviour
         if (s_GetEdgeRing == null)
             throw new InvalidOperationException("Could not locate ElementSelection.GetEdgeRing");
 
-        // 2) Invoke it — note it returns an IEnumerable<Edge>
+        // Invoke ProBuilders GerEdgeRing
         var args = new object[] { mesh, new Edge[] { seed } };
         var result = s_GetEdgeRing.Invoke(null, args);
 

@@ -6,24 +6,21 @@ public class ObjSelector : MonoBehaviour
 {
     // Private variables 
     private GameObject[] _pbObjectsInScene;
-    
-    // Scripts
     private HandleUpdater _handleUpdater;
-    
-    public GameObject proximityScalerManager;
-    
-    public float selectionRadius;
-    public LayerMask selectionMask;
     private ProximityScaler _proximityScaler;
     
-    
     //Public variables
+    public GameObject ClosestObj { get; private set; }
     public Material deselectedMat;
     public Material selectedMat;
     public GameObject leftController;
-    public GameObject ClosestObj { get; private set; } // Public property to access closest object
-    
-    // Find and select the closest object to the controller when "A" is pressed
+    public GameObject proximityScalerManager;
+    public float selectionRadius;
+    public LayerMask selectionMask;
+        
+    /// <summary>
+    /// Find and select the closest object to the controller when "X" on the left controller is pressed
+    /// </summary>
     public void SelectObj()
     {
         _pbObjectsInScene = GameObject.FindGameObjectsWithTag("ProBuilderObj"); // Find all objects with the tag

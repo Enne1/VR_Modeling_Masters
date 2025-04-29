@@ -6,13 +6,12 @@ using System.Linq;
 public class HandleUpdater : MonoBehaviour
 {
     private ProBuilderMesh _pbMesh;
-    private Dictionary<int, GameObject> _faceHandles = new Dictionary<int, GameObject>();
-    private Dictionary<int, Vector3> _lastFaceCenters = new Dictionary<int, Vector3>();
-    private Dictionary<int, Quaternion> _lastFaceRotations = new Dictionary<int, Quaternion>();
-    private Dictionary<int, Edge> _faceEdges = new Dictionary<int, Edge>();
+    private Dictionary<int, GameObject> _faceHandles;
+    private Dictionary<int, Vector3> _lastFaceCenters;
+    private Dictionary<int, Quaternion> _lastFaceRotations;
+    private Dictionary<int, Edge> _faceEdges;
 
     public GameObject handlePrefab;
-    public GameObject placeholderSignifier;
 
     void Start()
     {
@@ -35,6 +34,7 @@ public class HandleUpdater : MonoBehaviour
 
         List<Face> modifiedFaces = new List<Face>();
 
+        // Loop through each face to check for changes
         foreach (Face face in _pbMesh.faces)
         {
             if (face == null || face.indexes == null || face.indexes.Count == 0) continue;
@@ -43,6 +43,7 @@ public class HandleUpdater : MonoBehaviour
             Vector3 currentCenter = GetFaceCenter(face);
             Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, face));
 
+            // Cache the longest edge for the face, used for the handles rotation
             if (!_faceEdges.ContainsKey(faceId))
             {
                 _faceEdges[faceId] = GetLongestEdge(face);
@@ -53,7 +54,8 @@ public class HandleUpdater : MonoBehaviour
             if (longestEdge.a < 0 || longestEdge.b < 0 ||
                 longestEdge.a >= _pbMesh.positions.Count || longestEdge.b >= _pbMesh.positions.Count)
                 continue;
-
+            
+            // Compute the world-space direction of the longest edge
             Vector3 pointA = _pbMesh.transform.TransformPoint(_pbMesh.positions[longestEdge.a]);
             Vector3 pointB = _pbMesh.transform.TransformPoint(_pbMesh.positions[longestEdge.b]);
             Vector3 edgeDir = (pointB - pointA).normalized;
@@ -70,13 +72,17 @@ public class HandleUpdater : MonoBehaviour
                 _lastFaceRotations[faceId] = currentRotation;
             }
         }
-
+        
+        // Update only the handles for faces that changed
         if (modifiedFaces.Count > 0)
         {
             UpdateHandles(modifiedFaces);
         }
     }
 
+    /// <summary>
+    /// Creates or updates handle GameObjects for a list of faces.
+    /// </summary>
     public void UpdateHandles(List<Face> modifiedFaces = null)
     {
         if (_pbMesh == null) return;
@@ -92,6 +98,8 @@ public class HandleUpdater : MonoBehaviour
                 continue;
 
             int faceId = face.indexes.Min();
+            
+            // Compute face center and normal
             Vector3 faceCenter = GetFaceCenter(face);
             Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, face));
 
@@ -235,7 +243,7 @@ public class HandleUpdater : MonoBehaviour
         if (_pbMesh != null)
         {
             ClearAll();
-            UpdateHandles(); // Rebuild from scratch
+            UpdateHandles();
         }
     }
 }

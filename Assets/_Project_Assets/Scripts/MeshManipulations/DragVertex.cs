@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
-using UnityEngine.ProBuilder.MeshOperations;
 
 public class DragVertex : MonoBehaviour
 {
     private ObjSelector _objSelector;
     private ProBuilderMesh _pbMesh;
-    private HashSet<int> _selectedVertexIndices; // Store all shared vertices
+    private HashSet<int> _selectedVertexIndices;
     private bool _isDragging;
     private Vector3 _initialControllerPos;
     private Dictionary<int, Vector3> _initialVertexPositions;
@@ -32,8 +31,10 @@ public class DragVertex : MonoBehaviour
             DragVertexMove();
         }
     }
-
-    // Start dragging vertices (Now receives the controller transform as input)
+    
+    /// <summary>
+    /// Start dragging vertices, based on the position of the controller
+    /// </summary>
     public void StartDraggingVertex(Transform controllerTransform)
     {
         if (_objSelector == null || _objSelector.ClosestObj == null) return;
@@ -57,7 +58,6 @@ public class DragVertex : MonoBehaviour
             }
             _dragAlongGameObjects = _dragAlongList.ToArray();
         }
-
         
         // Find initial vertex to drag
         int closestVertexInitial = GetClosestVertex(controllerTransform);
@@ -73,8 +73,7 @@ public class DragVertex : MonoBehaviour
             }
         }
         
-        
-        // Collect all locked vertecies, to drag along
+        // Collect all multi-selected vertices, to drag along
         foreach (GameObject obj in _dragAlongGameObjects)
         {
             int closestVertex = GetClosestVertex(obj.transform);
@@ -91,6 +90,7 @@ public class DragVertex : MonoBehaviour
             }
         }
 
+        // Prepare dragging if 1 or more vertices are selected
         if (_selectedVertexIndices.Count > 0)
         {
             _activeController = controllerTransform;
@@ -104,8 +104,11 @@ public class DragVertex : MonoBehaviour
             _isDragging = true;
         }
     }
-
-    // Stop dragging and reset variables
+    
+    /// <summary>
+    /// Stop dragging and reset variables
+    /// Dragging is stopped when index trigger is released
+    /// </summary>
     public void StopDraggingVertex()
     {
         _dragAlongList.Clear();
@@ -115,8 +118,11 @@ public class DragVertex : MonoBehaviour
         _initialVertexPositions.Clear();
         _activeController = null;
     }
-
-    // Move the selected vertices
+    
+    /// <summary>
+    /// Move the selected vertices
+    /// Runs every update cycle
+    /// </summary>
     void DragVertexMove()
     {
         if (_selectedVertexIndices.Count == 0 || _pbMesh == null || _activeController == null) return;
@@ -126,6 +132,7 @@ public class DragVertex : MonoBehaviour
 
         List<Vector3> newPositions = _pbMesh.positions.ToList();
 
+        // apply controllers movement to each selected vertex
         foreach (int vertexIndex in _selectedVertexIndices)
         {
             Vector3 newVertexPos = _initialVertexPositions[vertexIndex] + movementDelta;
@@ -137,8 +144,10 @@ public class DragVertex : MonoBehaviour
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }
-
-    // Get the closest vertex index to the given transform
+    
+    /// <summary>
+    /// Get the closest vertex index to the given transform
+    /// </summary>
     int GetClosestVertex(Transform referenceTransform)
     {
         if (_pbMesh == null) return -1;
@@ -156,7 +165,6 @@ public class DragVertex : MonoBehaviour
                 closestVertex = i;
             }
         }
-
         return closestVertex;
     }
 }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.ProBuilder;
-using UnityEngine.ProBuilder.MeshOperations;
 
 public class DragFace : MonoBehaviour
 {
@@ -12,19 +11,20 @@ public class DragFace : MonoBehaviour
     private Vector3 _initialControllerPos;
     private Vector3 _initialFaceCenter;
     private Vector3 _currControllerPos;
-    private List<Face> _dragAlongFaces = new List<Face>();
+    private List<Face> _dragAlongFaces;
 
-    // New: Store union of all selected vertex indices and their initial positions
-    private HashSet<int> _selectedVertexIndices = new HashSet<int>();
-    private Dictionary<int, Vector3> _initialVertexWorldPositions = new Dictionary<int, Vector3>();
-
+    private HashSet<int> _selectedVertexIndices;
+    private Dictionary<int, Vector3> _initialVertexWorldPositions;
+    
+    private LineRenderer _normalAxisLineRenderer;
+    
     public GameObject leftController;
     public float minDragDistance;
-    private LineRenderer _normalAxisLineRenderer;
     public Material normalAxisMaterial;
 
     void Start()
     {
+        // Prepare lineRendere for snapping to normal
         _normalAxisLineRenderer = gameObject.AddComponent<LineRenderer>();
         _normalAxisLineRenderer.startWidth = 0.005f;
         _normalAxisLineRenderer.endWidth = 0.005f;
@@ -47,6 +47,9 @@ public class DragFace : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Prepare dragging of face when index trigger is pressed down
+    /// </summary>
     public void StartDraggingFace()
     {
         //Store current mesh state in undo Stack
@@ -63,7 +66,7 @@ public class DragFace : MonoBehaviour
         _selectedVertexIndices.Clear();
         _initialVertexWorldPositions.Clear();
         
-        // Retrieve multi-face selection list (assumed to be set up already)
+        // Retrieve multi-face selection list
         MultiSelectedList facesSelectedList = _pbMesh.transform.GetComponent<MultiSelectedList>();
         
         if (facesSelectedList != null && facesSelectedList.selectedFaces != null)
@@ -91,7 +94,7 @@ public class DragFace : MonoBehaviour
             }
         }
         
-        // Now, include any vertices in the entire mesh that share the same world coordinate 
+        // Include any vertices in the entire mesh that share the same world coordinate 
         // as any vertex already in _selectedVertexIndices.
         var selectedIndicesCopy = new List<int>(_selectedVertexIndices);
         foreach (int selectedIndex in selectedIndicesCopy)
@@ -118,6 +121,7 @@ public class DragFace : MonoBehaviour
             _initialVertexWorldPositions[index] = worldPos;
         }
         
+        // Draw line in the direction of the faces normal vector
         _isDragging = true;
         Vector3 localNormal = Math.Normal(_pbMesh, _selectedFace);
         Vector3 faceNormal = _pbMesh.transform.TransformDirection(localNormal);
@@ -126,6 +130,10 @@ public class DragFace : MonoBehaviour
         _normalAxisLineRenderer.SetPosition(1, faceNormal * -100 + _initialFaceCenter);
     }
     
+    /// <summary>
+    /// Stop dragging and reset variables
+    /// Run the index trigger is released
+    /// </summary>
     public void StopDraggingFace()
     {
         _isDragging = false;
@@ -136,6 +144,10 @@ public class DragFace : MonoBehaviour
         _normalAxisLineRenderer.enabled = false;
     }
 
+    /// <summary>
+    /// Runs every update cycle
+    /// continuously moved face to controller position
+    /// </summary>
     void DragFaceUpdater()
     {
         if (_selectedFace == null || _pbMesh == null) return;
@@ -149,7 +161,7 @@ public class DragFace : MonoBehaviour
         float movementAlongNormal = Vector3.Dot(movementDelta, faceNormal);
         Vector3 constrainedMovement = faceNormal * movementAlongNormal;
     
-        // Decide if we snap to movement along the normal or use full movement.
+        // Decide if we snap to movement along the normal or use full freedom movement.
         float snapThreshold = 0.05f;
         float deviation = (movementDelta - constrainedMovement).magnitude;
         Vector3 finalMovement = deviation < snapThreshold ? constrainedMovement : movementDelta;
@@ -171,7 +183,9 @@ public class DragFace : MonoBehaviour
         _pbMesh.Refresh();
     }
 
-    
+    /// <summary>
+    /// Calculates the closest face to the controller
+    /// </summary>
     Face GetClosestFace(Transform referenceTransform)
     {
         if (_pbMesh == null || referenceTransform == null) return null;
@@ -180,6 +194,7 @@ public class DragFace : MonoBehaviour
         float minDistance = minDragDistance;
         Face closestFace = null;
 
+        // Loops over all faces to find the closest
         foreach (Face face in _pbMesh.faces)
         {
             Vector3 faceCenter = GetFaceCenter(face);
@@ -193,6 +208,9 @@ public class DragFace : MonoBehaviour
         return closestFace;
     }
 
+    /// <summary>
+    /// Calculates the center of a face
+    /// </summary>
     Vector3 GetFaceCenter(Face face)
     {
         Vector3 sum = Vector3.zero;

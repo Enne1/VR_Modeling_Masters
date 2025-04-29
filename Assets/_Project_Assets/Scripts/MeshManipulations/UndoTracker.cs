@@ -2,13 +2,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
-using UnityEngine.ProBuilder.MeshOperations;
 
 public class UndoTracker : MonoBehaviour
 {
     private ProBuilderMesh _pbMesh;
-    private Stack<GameObject> _undoStack = new Stack<GameObject>();
-    private Stack<GameObject> _redoStack = new Stack<GameObject>(); // ← new
+    private Stack<GameObject> _undoStack;
+    private Stack<GameObject> _redoStack;
 
     public int maxUndoSteps = 50;
 
@@ -18,17 +17,17 @@ public class UndoTracker : MonoBehaviour
     }
 
     /// <summary>
-    /// Call this to record the current mesh state before you make a new change.
+    /// Call this to record the current mesh state before a new change is made to the mesh
+    /// Should be called before operations such as Extrude, Drag, Loop-Cut, ect. 
     /// Clears redo history, since new edits invalidate the redo stack.
     /// </summary>
     public void SaveState()
     {
         if (_pbMesh == null) return;
 
-        // Any new edit clears your ability to redo past undos
         _redoStack.Clear();
 
-        // Create a deep snapshot of this GameObject
+        // Create a snapshot of the GameObject in current state
         GameObject snapshot = Instantiate(gameObject);
         snapshot.name = $"{gameObject.name}_UndoSnapshot";
         snapshot.SetActive(false);
@@ -39,13 +38,13 @@ public class UndoTracker : MonoBehaviour
         // Push it onto undo stack
         _undoStack.Push(snapshot);
 
-        // Trim the oldest undo if we exceed max steps
+        // Trim the oldest undo if list exceed max steps
         if (_undoStack.Count > maxUndoSteps)
         {
             // Pop everything out, drop the last, then re‐push
             List<GameObject> temp = new List<GameObject>();
             while (_undoStack.Count > 0) temp.Add(_undoStack.Pop());
-            Destroy(temp[temp.Count - 1]); // delete the oldest
+            Destroy(temp[temp.Count - 1]); // delete the oldest 
             temp.RemoveAt(temp.Count - 1);
             for (int i = temp.Count - 1; i >= 0; i--)
                 _undoStack.Push(temp[i]);
@@ -59,7 +58,7 @@ public class UndoTracker : MonoBehaviour
     {
         if (_pbMesh == null || _undoStack.Count == 0) return;
 
-        // Snapshot *this* state for redo
+        // Snapshot current state for redo
         GameObject redoSnapshot = Instantiate(gameObject);
         redoSnapshot.name = $"{gameObject.name}_RedoSnapshot";
         redoSnapshot.SetActive(false);
@@ -69,7 +68,7 @@ public class UndoTracker : MonoBehaviour
             _redoStack.Push(redoSnapshot);
         }
 
-        // Apply the actual undo snapshot
+        // Apply the  undo snapshot
         GameObject snapshot = _undoStack.Pop();
         ApplySnapshot(snapshot);
         Destroy(snapshot);
@@ -82,8 +81,7 @@ public class UndoTracker : MonoBehaviour
     public void Redo()
     {
         if (_pbMesh == null || _redoStack.Count == 0) return;
-
-        // Snapshot this state so you can undo the redo
+        
         GameObject undoSnapshot = Instantiate(gameObject);
         undoSnapshot.name = $"{gameObject.name}_UndoSnapshot";
         undoSnapshot.SetActive(false);

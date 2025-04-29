@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 
@@ -8,13 +7,10 @@ public class EdgeVisualizer : MonoBehaviour
 {
     private ProBuilderMesh _pbMesh;
 
-    private Dictionary<(int, int), GameObject> _edgeMarkers = new();
-    private Dictionary<(int, int), Vector3> _lastMidpoints = new();
-    private Dictionary<int, Vector3> _lastVertexPositions = new();
-
-
-    private Dictionary<int, int> _vertexToSharedGroup = new();
-    private HashSet<(int, int)> _knownEdges = new();
+    private Dictionary<(int, int), GameObject> _edgeMarkers;
+    private Dictionary<(int, int), Vector3> _lastMidpoints;
+    private Dictionary<int, Vector3> _lastVertexPositions;
+    private Dictionary<int, int> _vertexToSharedGroup;
 
     public GameObject edgePrefab;
 
@@ -41,8 +37,10 @@ public class EdgeVisualizer : MonoBehaviour
             BuildEdgeMarkers();
         }
     }
-
-    // Remap every vertex index to its shared‐group representative raw index
+    
+    /// <summary>
+    /// Remap every vertex index to its shared‐group representative raw index
+    /// </summary>
     void BuildVertexToSharedGroupLookup()
     {
         _vertexToSharedGroup.Clear();
@@ -54,16 +52,18 @@ public class EdgeVisualizer : MonoBehaviour
                 _vertexToSharedGroup[vi] = rep;
         }
     }
-  
-    // Rebuild (and update) all edge markers
+    
+    /// <summary>
+    /// Rebuild (and update) all edge markers
+    /// </summary>
     void BuildEdgeMarkers()
     {
         if (_pbMesh == null) return;
 
-        // 2a) make sure our shared‐vertex lookup is up to date
+        // make sure shared‐vertex lookup is up to date
         BuildVertexToSharedGroupLookup();
 
-        // 2b) collect ALL unique edges, as (repA,repB)
+        // collect all unique edges, as (repA,repB)
         var uniqueEdges = new HashSet<(int, int)>();
         foreach (var face in _pbMesh.faces)
         {
@@ -72,6 +72,7 @@ public class EdgeVisualizer : MonoBehaviour
             {
                 int repA = _vertexToSharedGroup[e.a];
                 int repB = _vertexToSharedGroup[e.b];
+                
                 // sort so (3,7) not (7,3)
                 int a = Mathf.Min(repA, repB);
                 int b = Mathf.Max(repA, repB);
@@ -79,14 +80,14 @@ public class EdgeVisualizer : MonoBehaviour
             }
         }
 
-        // 2c) create any brand‐new edge markers
+        // create any new edge markers
         foreach (var edge in uniqueEdges)
         {
             if (!_edgeMarkers.ContainsKey(edge))
                 CreateEdgeMarker(edge.Item1, edge.Item2);
         }
 
-        // 2d) update positions + rotations of *all* existing markers
+        // update positions + rotations of all existing markers
         foreach (var kvp in _edgeMarkers)
         {
             (int a, int b) = kvp.Key;
@@ -105,16 +106,11 @@ public class EdgeVisualizer : MonoBehaviour
                 _lastMidpoints[kvp.Key] = mid;
             }
         }
-
-        // 2e) if you want to remove markers on edges that went away:
-        //     var gone = _edgeMarkers.Keys.Except(uniqueEdges).ToList();
-        //     foreach(var key in gone) { Destroy(_edgeMarkers[key]); _edgeMarkers.Remove(key); }
-          
-        _knownEdges = new HashSet<(int, int)>(uniqueEdges);
     }
-
-
-    // ——— 3) Instantiate a marker for edge (repA,repB) ———
+    
+    /// <summary>
+    /// Instantiate a marker for edge (repA,repB)
+    /// </summary>
     void CreateEdgeMarker(int repA, int repB)
     {
         Vector3 posA = _pbMesh.transform.TransformPoint(_pbMesh.positions[repA]);
@@ -125,13 +121,15 @@ public class EdgeVisualizer : MonoBehaviour
         var marker = Instantiate(edgePrefab, mid, rot, _pbMesh.transform);
         marker.name = $"Edge_{repA}_{repB}";
 
-        marker.GetComponent<EdgeMarkerData>()?.setEdge(repA, repB);
+        marker.GetComponent<EdgeMarkerData>()?.SetEdge(repA, repB);
         
         _edgeMarkers[(repA, repB)] = marker;
         _lastMidpoints[(repA, repB)] = mid;
     }
 
-    
+    /// <summary>
+    /// Check if any changes have been made to the mesh, and thus if the edge visualizer needs to update
+    /// </summary>
     List<int> GetModifiedSharedVertexGroups()
     {
         List<int> modifiedGroups = new();
@@ -152,12 +150,14 @@ public class EdgeVisualizer : MonoBehaviour
         return modifiedGroups;
     }
 
+    /// <summary>
+    /// Clear signifiers, used for rebuild of all mesh signifiers
+    /// </summary>
     public void ClearAll()
     {
         _edgeMarkers.Clear();
         _lastMidpoints.Clear();
         _vertexToSharedGroup.Clear();
-        _knownEdges.Clear();
 
         List<Transform> childrenToDestroy = new List<Transform>();
         foreach (Transform child in transform)
@@ -174,6 +174,9 @@ public class EdgeVisualizer : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Begin rebuild of signifiers
+    /// </summary>
     public void ReBuildEdges()
     {
         if (_pbMesh == null)

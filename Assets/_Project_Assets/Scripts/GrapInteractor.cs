@@ -39,14 +39,14 @@ public class GrapInteractor : MonoBehaviour
             ScaleProBuilderMesh(_initialScale * scaleMultiplier);
         }
     }
-
-    // Use OverlapSphere instead of distance-to-center check
+    
+    /// <summary>
+    /// Attach the selected object to the controller when starting grab
+    /// </summary>
     public void AttachToController()
     {
         if (_pbMesh == null) return;
         
-       // _wireframeScript.updateWireframe = true;
-
         if (IsControllerNearObject(rightController.transform.position))
         {
             _relativeDistance = rightController.transform.InverseTransformPoint(_pbMesh.transform.position);
@@ -55,6 +55,9 @@ public class GrapInteractor : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Release the object from the controller
+    /// </summary>
     public void DetachFromController()
     {
         //_wireframeScript.updateWireframe = false;
@@ -62,12 +65,49 @@ public class GrapInteractor : MonoBehaviour
         _isGrabbing = false;
     }
 
+    /// <summary>
+    /// Make the mesh follow the controller when the controller is moved
+    /// If the meshs rotation is close to a 90° interval on any axis, snap to that axis
+    /// </summary>
     void FollowController()
     {
         _pbMesh.transform.position = rightController.transform.TransformPoint(_relativeDistance);
-        _pbMesh.transform.rotation = rightController.transform.rotation * _relativeRotation;
+
+        // compute the desired rotation from the controller
+        Quaternion desired = rightController.transform.rotation * _relativeRotation;
+
+        // Snap the mesh to an axis (x, y, z), if it is within 5° of a 90° rotation
+        Quaternion snapped = SnapTo90(desired, 5f);
+        _pbMesh.transform.rotation = snapped;
+
+        
+       // snaps each Euler component if it’s within 'threshold' degrees of 0°, 90°, 180°, 270°, etc.
+        Quaternion SnapTo90(Quaternion q, float threshold)
+        {
+            Vector3 e = q.eulerAngles;
+            e.x = SnapAxis(e.x, threshold);
+            e.y = SnapAxis(e.y, threshold);
+            e.z = SnapAxis(e.z, threshold);
+            return Quaternion.Euler(e);
+        }
+
+        // Find out if the mesh needs to snap to an axit or not 
+        float SnapAxis(float angle, float threshold)
+        {
+            // find the nearest multiple of 90°
+            float nearest = Mathf.Round(angle / 90f) * 90f;
+            // Mathf.DeltaAngle handles wrapping correctly (e.g. comparing 359° to 0°)
+            if (Mathf.Abs(Mathf.DeltaAngle(angle, nearest)) <= threshold)
+                return nearest;
+            return angle;
+        }
+        
     }
 
+    /// <summary>
+    /// If both hand trigger buttons are pressed down, switch from grabbing to scaling
+    /// Scale mesh based on how far apart the user moved the controllers from eachother
+    /// </summary>
     void ScaleProBuilderMesh(Vector3 targetScale)
     {
         Vector3[] vertices = _pbMesh.positions.ToArray();
@@ -96,6 +136,9 @@ public class GrapInteractor : MonoBehaviour
         _pbMesh.Refresh();
     }
     
+    /// <summary>
+    /// Prepare the mesh for scaling
+    /// </summary>
     public void StartScaling()
     {
         _isScaling = true;
@@ -103,6 +146,9 @@ public class GrapInteractor : MonoBehaviour
         _initialScale = transform.localScale;
     }
 
+    /// <summary>
+    /// stop the mesh from scaling when one of the hand trigger buttons are released
+    /// </summary>
     public void StopScaling()
     {
         _isScaling = false;
@@ -118,10 +164,9 @@ public class GrapInteractor : MonoBehaviour
         {
             if (collider.gameObject == _pbMesh.gameObject)
             {
-                return true; // Controller is near the object
+                return true;
             }
         }
         return false;
     }
 }
-

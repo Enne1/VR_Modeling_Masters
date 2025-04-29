@@ -19,7 +19,8 @@ public class VertexVisualizer : MonoBehaviour
         _pbMesh = GetComponent<ProBuilderMesh>();
         if (_pbMesh != null)
         {
-            UpdateVertexSpheresAndPadlocks(); // Init all
+            // Initiate the vertex markers on mesh creation 
+            UpdateVertexSpheresAndPadlocks();
             foreach (Transform child in transform)
             {
                 child.gameObject.SetActive(false);
@@ -32,12 +33,17 @@ public class VertexVisualizer : MonoBehaviour
         if (_pbMesh == null) return;
 
         List<int> modifiedGroups = GetModifiedSharedVertexGroups();
+        
+        // Update only modified vertices
         if (modifiedGroups.Count > 0)
         {
             UpdateVertexSpheresAndPadlocks(modifiedGroups);
         }
     }
 
+    /// <summary>
+    /// Update/create vertex signifiers for each modified/new vertex in the mesh
+    /// </summary>
     void UpdateVertexSpheresAndPadlocks(List<int> modifiedGroups = null)
     {
         if (_pbMesh == null) return;
@@ -52,6 +58,7 @@ public class VertexVisualizer : MonoBehaviour
             }
         }
 
+        // loop over vertices in the mesh
         foreach (int groupIndex in modifiedGroups)
         {
             int representative = sharedVertices[groupIndex][0];
@@ -71,7 +78,7 @@ public class VertexVisualizer : MonoBehaviour
                 _vertexSpheres[groupIndex].transform.position = worldPos;
             }
 
-            // Update or create padlock
+            // Update or create padlock (attached to the vertex signifier)
             if (!_vertexPadlocks.ContainsKey(groupIndex))
             {
                 GameObject padlock = Instantiate(padlockPrefab, Vector3.zero, Quaternion.identity, _vertexSpheres[groupIndex].transform);
@@ -105,6 +112,10 @@ public class VertexVisualizer : MonoBehaviour
         return modified;
     }
 
+    /// <summary>
+    /// Calculate the most optimal position for the padlock
+    /// Most optimal is the position that is furthest away from faces connected to the vertex
+    /// </summary>
     Vector3 FindPadlockLocalPosition(int vertexIndex, Transform sphereTransform)
     {
         Vector3 optimalDirectionWorld = GetFurthestDirection(vertexIndex);
@@ -112,6 +123,9 @@ public class VertexVisualizer : MonoBehaviour
         return -optimalDirectionLocal.normalized * padlockOffset;
     }
 
+    /// <summary>
+    /// Calculate the vector pointing furthest away from faces connected to the vertex
+    /// </summary>
     Vector3 GetFurthestDirection(int vertexIndex)
     {
         List<Vector3> normals = GetConnectedFaceNormals(vertexIndex);
@@ -127,6 +141,9 @@ public class VertexVisualizer : MonoBehaviour
         return sum == Vector3.zero ? Vector3.up : (-sum).normalized;
     }
 
+    /// <summary>
+    /// Get normal vector of a face
+    /// </summary>
     List<Vector3> GetConnectedFaceNormals(int vertexIndex)
     {
         List<Vector3> normals = new List<Vector3>();
@@ -154,6 +171,9 @@ public class VertexVisualizer : MonoBehaviour
         return normals;
     }
 
+    /// <summary>
+    /// Clear all vertex signifiers in the mesh 
+    /// </summary>
     public void ClearAll()
     {
         _vertexSpheres.Clear();
@@ -175,6 +195,9 @@ public class VertexVisualizer : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Begin rebuild of signifiers
+    /// </summary>
     public void RebuildVertices()
     {
         if (_pbMesh == null)

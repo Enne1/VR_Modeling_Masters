@@ -16,28 +16,28 @@ public class CopySaveMesh : MonoBehaviour
     public GameObject[] saveCopyIcon;
     public string fileName;
     
-    private string fullPath;
+    private string _fullPath;
     private bool _isHooked;
     private string _json;
     private GameObject _candidate;
-
     
     void Start()
     {
-        fullPath = Path.Combine(Application.persistentDataPath, fileName);
+        // Initiate Path for where to save mesh data
+        _fullPath = Path.Combine(Application.persistentDataPath, fileName);
         
-        // ensure trigger
         var col = GetComponent<Collider>();
         col.isTrigger = true;
         
-        string content = File.ReadAllText(fullPath);
+        // Find pre-existing save data for the copy machine, and load up the data if any exist 
+        string content = File.ReadAllText(_fullPath);
         if (content.Length > 0)
         {
             GameObject savedObj = Instantiate(defaultCube, snapPoint.transform.position, Quaternion.identity);
             saveCopyIcon[0].SetActive(false);
             saveCopyIcon[1].SetActive(true);
             
-            ProBuilderMeshData loadedData = JsonUtility.FromJson<ProBuilderMeshData>(File.ReadAllText(fullPath));
+            ProBuilderMeshData loadedData = JsonUtility.FromJson<ProBuilderMeshData>(File.ReadAllText(_fullPath));
 
             ProBuilderMesh mesh = savedObj.GetComponent<ProBuilderMesh>();
             if (mesh == null) mesh = savedObj.AddComponent<ProBuilderMesh>();
@@ -51,6 +51,10 @@ public class CopySaveMesh : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Save mesh data when dragged into copy machines trigger
+    /// Also attach the mesh to the snap point in the save field, and scale down to fit
+    /// </summary>
     void OnTriggerEnter(Collider other)
     {
         if (((1 << other.gameObject.layer) & draggableLayers) != 0 && !_isHooked)
@@ -58,12 +62,15 @@ public class CopySaveMesh : MonoBehaviour
             
             _candidate = other.gameObject;
             
+            // Get the mesh, and reset its pivot point to center of mass
             ProBuilderMesh otherPb = other.gameObject.GetComponent<ProBuilderMesh>();
             otherPb.SetPivot(other.transform.GetComponent<Renderer>().bounds.center);
             
+            // Snap the mesh to snap point
             grabManager.GetComponent<GrapInteractor>().DetachFromController();
             other.transform.position = snapPoint.position;
             
+            // Size down mesh
             PBUtils.NormalizeMeshSize(other.GetComponent<ProBuilderMesh>(), 0.1f);
             
             // Save Mesh data
@@ -78,14 +85,14 @@ public class CopySaveMesh : MonoBehaviour
             
             try
             {
-                File.WriteAllText(fullPath, _json);
+                File.WriteAllText(_fullPath, _json);
             }
             catch (IOException e)
             {
                 Debug.LogError($"Failed to write mesh data to file: {e.Message}");
             }
             
-            // Enable the copying
+            // Enable the copying of the mesh
             var platformObj = spawnPlatform.GetComponent<ShapeCopying>();
             platformObj.proBuilderShape = defaultCube;
             saveCopyIcon[0].SetActive(false);
@@ -95,6 +102,10 @@ public class CopySaveMesh : MonoBehaviour
         }
     }
     
+    /// <summary>
+    /// Remove file data from file when mesh is removed
+    /// disable saved icon
+    /// </summary>
     void OnTriggerExit(Collider other)
         {
             if (other.gameObject == _candidate && _isHooked)
@@ -109,7 +120,7 @@ public class CopySaveMesh : MonoBehaviour
                 
                 try
                 {
-                    File.WriteAllText(fullPath, string.Empty);
+                    File.WriteAllText(_fullPath, string.Empty);
                 }
                 catch (IOException e)
                 {
@@ -118,10 +129,12 @@ public class CopySaveMesh : MonoBehaviour
             }
         }    
     
-    // Load Mesh data
+    /// <summary>
+    /// Load mesh data from file
+    /// </summary>
     public void LoadData()
     {
-        ProBuilderMeshData loadedData = JsonUtility.FromJson<ProBuilderMeshData>(File.ReadAllText(fullPath));
+        ProBuilderMeshData loadedData = JsonUtility.FromJson<ProBuilderMeshData>(File.ReadAllText(_fullPath));
 
         ProBuilderMesh mesh = copiedMesh.GetComponent<ProBuilderMesh>();
         if (mesh == null) mesh = copiedMesh.AddComponent<ProBuilderMesh>();
@@ -138,6 +151,9 @@ public class CopySaveMesh : MonoBehaviour
     }
 }
 
+/// <summary>
+/// New class to ensure the copied/loaded mesh has the necessary ProBuilder properties
+/// </summary>
 [System.Serializable]
 public class ProBuilderMeshData
 {

@@ -23,6 +23,10 @@ public class MergeFaces : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Call this to check if two faces can be merged together, if so the faces gets merged together
+    /// Removes the faces of the parts merged together, and clean up the mesh and signifiers
+    /// </summary>
     public void MergeCloseFaces()
     {
         if (_pbMesh == null) {
@@ -62,7 +66,7 @@ public class MergeFaces : MonoBehaviour
                     // Weld vertices first (modifies mesh)
                     VertexEditing.WeldVertices(_pbMesh, combinedIndexes, vertexMergeThreshold);
 
-                    // Remove the exact face objects we merged
+                    // Remove the exact face objects merged
                     var newFaces = new List<Face>(_pbMesh.faces);
                     newFaces.RemoveAll(f => f == originalA || f == originalB);
                     _pbMesh.faces = newFaces;
@@ -77,17 +81,19 @@ public class MergeFaces : MonoBehaviour
                 }
             }
         }
-        
         _pbMesh.ToMesh();
         _pbMesh.Refresh();
     }
 
+    /// <summary>
+    /// Boolean operation used to check if all four vertices of one face is close enough to all four vertices of another face, so they can merge
+    /// </summary>
     private bool FacesCanBeMerged(Face a, Face b)
     {
         var aDistinct = a.distinctIndexes;
         var bDistinct = b.distinctIndexes;
 
-        // make sure they have the same number of "corners"
+        // make sure they have the same number of vertices
         if (aDistinct.Count != bDistinct.Count)
             return false;
 

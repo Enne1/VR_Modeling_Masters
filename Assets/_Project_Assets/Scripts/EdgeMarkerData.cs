@@ -5,7 +5,10 @@ public class EdgeMarkerData : MonoBehaviour
 {
     public (int, int) edge;
 
-    public void setEdge(int a, int b)
+    /// <summary>
+    /// Store the two vertex values for which the edge signifier is attached to
+    /// </summary>
+    public void SetEdge(int a, int b)
     {
         edge = (a, b);
     }

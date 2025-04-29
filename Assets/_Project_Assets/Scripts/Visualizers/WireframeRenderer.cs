@@ -6,53 +6,60 @@ using UnityEngine;
  [RequireComponent(typeof(ProBuilderMesh))]
  public class WireframeRenderer : MonoBehaviour
  {
-     public Color wireColor = Color.green; // Wireframe color
-     private ProBuilderMesh pbMesh;
-     private HashSet<Edge> quadEdges = new HashSet<Edge>();
-     private int lastVertexCount = 0; // Track mesh changes
-     public Material WireframeMaterial;
+     public Color wireColor = Color.green;
+     private ProBuilderMesh _pbMesh;
+     private HashSet<Edge> _quadEdges;
+     private int _lastVertexCount;
+     public Material wireframeMaterial;
 
      private void Start()
      {
-         pbMesh = GetComponent<ProBuilderMesh>();
-         UpdateWireframe(); // Initial setup
+         _pbMesh = GetComponent<ProBuilderMesh>();
+         UpdateWireframe();
      }
 
     private void Update()
     {
-        // Check if the mesh has changede
-        if (pbMesh.vertexCount != lastVertexCount)
+        // Check if the mesh has changed
+        if (_pbMesh.vertexCount != _lastVertexCount)
         {
             UpdateWireframe();
-            lastVertexCount = pbMesh.vertexCount;
+            _lastVertexCount = _pbMesh.vertexCount;
         }
     }
     
+    /// <summary>
+    /// GL Lines used to draw the lines for the wireframe
+    /// </summary>
     private void OnRenderObject()
     {
-        if (quadEdges.Count == 0) return;
+        if (_quadEdges.Count == 0) return;
 
-        WireframeMaterial.SetPass(0);
+        wireframeMaterial.SetPass(0);
         GL.Begin(GL.LINES);
         GL.Color(wireColor);
 
-        foreach (Edge edge in quadEdges)
+        foreach (Edge edge in _quadEdges)
         {
-            DrawEdge(pbMesh.positions[edge.a], pbMesh.positions[edge.b]);
+            DrawEdge(_pbMesh.positions[edge.a], _pbMesh.positions[edge.b]);
         }
 
         GL.End(); 
     }
 
  
+    /// <summary>
+    /// Continuously find the edges that should have a wireframe line drawn between them 
+    /// </summary>
      private void UpdateWireframe()
      {
-         quadEdges.Clear(); // Clear previous edges
+         _quadEdges.Clear(); 
          Dictionary<Edge, int> edgeCount = new Dictionary<Edge, int>();
  
-         foreach (Face face in pbMesh.faces)
+         // Loop over each face in the mesh
+         foreach (Face face in _pbMesh.faces)
          {
-             if (face.edges.Count == 4) // Ensure the face is a quad
+             if (face.edges.Count == 4)
              {
                  foreach (Edge edge in face.edges)
                  {
@@ -65,15 +72,18 @@ using UnityEngine;
          // Only add edges that are part of quads
          foreach (var kvp in edgeCount)
          {
-             if (kvp.Value == 1) // Unique edges (not internal)
-                 quadEdges.Add(kvp.Key);
+             if (kvp.Value == 1)
+                 _quadEdges.Add(kvp.Key);
          }
  
-         pbMesh.ToMesh();
-         pbMesh.Refresh();
+         _pbMesh.ToMesh();
+         _pbMesh.Refresh();
      }
      
  
+    /// <summary>
+    /// Get point A and B for the edge which a line should be drawn between
+    /// </summary>
      private void DrawEdge(Vector3 v0, Vector3 v1)
      {
          GL.Vertex(transform.TransformPoint(v0));

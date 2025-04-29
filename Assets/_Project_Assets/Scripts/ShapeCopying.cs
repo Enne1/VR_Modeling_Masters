@@ -2,13 +2,14 @@ using UnityEngine;
 
 public class ShapeCopying : MonoBehaviour
 {
-// Public variables
     public GameObject proBuilderShape;
     public GameObject copyPlayform;
     public float spawnRadius;
     public LayerMask detectionLayer; 
 
-    // Spawn an initial shape on the spawner petistal
+    /// <summary>
+    /// Spawn an initial shape on the spawner petistal
+    /// </summary>
     private void Start()
     {
         if(proBuilderShape == null)
@@ -17,8 +18,10 @@ public class ShapeCopying : MonoBehaviour
         Instantiate(proBuilderShape, transform.position, Quaternion.identity);
     }
 
-    // When the shape is removed from the petistal, generate a new one
-    // If a shape exists within the "Physics.CheckSphere" don't add a new one
+    /// <summary>
+    /// When the shape is removed from the petistal, generate a new one
+    /// If a shape exists within the "Physics.CheckSphere" don't add a new one
+    /// </summary>
     private void Update()
     {
         // Check if the area is empty before spawning a new cube

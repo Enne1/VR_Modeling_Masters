@@ -3,6 +3,8 @@ using TMPro;
 
 public class ConsoleToGUI : MonoBehaviour
 {
+    // Script ONLY used for testing of program
+    
     static string myLog = "";
     private string output;
     private string stack;
@@ -19,6 +21,9 @@ public class ConsoleToGUI : MonoBehaviour
         Application.logMessageReceived -= Log;
     }
 
+    /// <summary>
+    /// Takes the console seen in the Unity Editor, and saves the outputs, to show in the text field at runtime 
+    /// </summary>
     public void Log(string logString, string stackTrace, LogType type)
     {
         output = logString;
@@ -49,6 +54,9 @@ public class ConsoleToGUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Removes all content of the log
+    /// </summary>
     public void ClearLog()
     {
         myLog = "";
