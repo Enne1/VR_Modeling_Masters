@@ -13,7 +13,7 @@ public class ExtrudeFeature : MonoBehaviour
     private List<Face> _dragAlongFaces = new List<Face>(); 
     private bool _isDragging;
     private Vector3 _initialControllerPos;
-    //private Vector3 _initialFaceCenter;
+    private Vector3 _initialFaceCenter;
     private Vector3 _currControllerPos;
     private float _totalDraggedDistance;
     
@@ -23,11 +23,14 @@ public class ExtrudeFeature : MonoBehaviour
     
     // Public variables
     public GameObject rightController;
+    public GameObject leftController;
     public float minExtrudeDistance;
+    public float angledSnapTolerance;
     
     //Ruler settings
-    public GameObject tickPrefab;       // assign in inspector
-    public float tickSpacing = 0.01f;   // 1cm spacing
+    public GameObject tickPrefabSmall;
+    public GameObject tickPrefabLarge;
+    public float tickSpacing = 0.01f;
     private List<GameObject> _rulerTicks = new List<GameObject>();
     private Face[] _extrudedFaces;
     private HashSet<Face> _originalFaces;
@@ -156,6 +159,41 @@ public class ExtrudeFeature : MonoBehaviour
         // For extrusion, use the constrained movement.
         Vector3 finalMovement = constrainedMovement;
         
+        // Find face close to left controller for possible snapping based on that face' plane
+        Face leftControllerFace = GetClosestFace(leftController.transform);
+        if (leftControllerFace != null)
+        {
+            // Get left controller face' center point and normal vector
+            Vector3 leftControllerFaceCenterpoint = GetFaceCenter(leftControllerFace);
+            Vector3 leftcontrollerLocalNormal = Math.Normal(_pbMesh, leftControllerFace);
+
+            // Create plane based on the center position and the facs' normal vector
+            Vector3 snappingPlaneNormal = _pbMesh.transform.TransformDirection(leftcontrollerLocalNormal).normalized;
+            Plane snappingPlane = new Plane(snappingPlaneNormal, leftControllerFaceCenterpoint);
+
+            // Get world-space normal of the extruded face
+            Vector3 rightFaceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, _selectedFace)).normalized;
+
+            float angleBetweenNormals = Vector3.Angle(rightFaceNormal, snappingPlaneNormal);
+
+            // If the angle between the two faces is below threshold, snap
+            if (angleBetweenNormals < angledSnapTolerance && leftControllerFace != _selectedFace)
+            {
+                Vector3 movedFaceCenter = _initialFaceCenter + finalMovement;
+                float distanceToPlane = snappingPlane.GetDistanceToPoint(movedFaceCenter);
+
+                if (Mathf.Abs(distanceToPlane) < 0.01f) 
+                {
+                    // Compute constrained correction along the extrusion normal
+                    Vector3 snapCorrection = -snappingPlane.normal * distanceToPlane;
+                    Vector3 constrainedCorrection = Vector3.Project(snapCorrection, rightFaceNormal);
+
+                    // Apply snapped coordinate
+                    finalMovement = movedFaceCenter + constrainedCorrection - _initialFaceCenter;
+                }
+            }
+        }
+        
         // Make a mutable copy of the mesh positions.
         List<Vector3> newPositions = new List<Vector3>(_pbMesh.positions);
         foreach (int index in _selectedVertexIndices)
@@ -183,6 +221,7 @@ public class ExtrudeFeature : MonoBehaviour
         
         // start by finding the face closest to the controller.
         Face controllerFace = GetClosestFace();
+        _initialFaceCenter = GetFaceCenter(controllerFace);
         if (controllerFace != null)
         {
             facesToExtrude.Add(controllerFace);
@@ -307,28 +346,48 @@ public class ExtrudeFeature : MonoBehaviour
             Destroy(t);
         _rulerTicks.Clear();
 
-        if (_extrudedFaces == null || _originalFaces == null || tickPrefab == null)
+        if (_extrudedFaces == null || _originalFaces == null || tickPrefabSmall == null || tickPrefabLarge == null)
             return;
 
-        
-        // Sample only the truly new edges
         foreach (var edge in _sideWallEdges)
         {
             Vector3 pA = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.a]);
             Vector3 pB = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.b]);
             float length = Vector3.Distance(pA, pB);
-            int   count  = Mathf.FloorToInt(length / tickSpacing);
-            
-            // Place tick marks at 1 cm intervals
+            int count = Mathf.FloorToInt(length / tickSpacing);
+            Vector3 edgeDir = (pB - pA).normalized;
+
+            // Define an arbitrary forward direction that's not colinear with edgeDir
+            Vector3 forward = Vector3.Cross(edgeDir, Vector3.forward);
+            if (forward.sqrMagnitude < 0.001f) // edgeDir is parallel to Vector3.forward
+            {
+                forward = Vector3.Cross(edgeDir, Vector3.up);
+            }
+
+            // Create a rotation where the Y-axis points along edgeDir
+            Quaternion tickRotation = Quaternion.LookRotation(forward, edgeDir);
+
             for (int i = 0; i <= count; i++)
             {
-                float    t   = (tickSpacing * i) / length;
-                Vector3 pos  = Vector3.Lerp(pA, pB, t);
-                var      tick = Instantiate(tickPrefab, pos, Quaternion.identity, transform);
+                float distanceAlongEdge = tickSpacing * i;
+                float t = distanceAlongEdge / length;
+                Vector3 pos = Vector3.Lerp(pA, pB, t);
+
+                bool isMajorTick = i % 5 == 0;
+
+                GameObject tick = Instantiate(
+                    isMajorTick ? tickPrefabLarge : tickPrefabSmall,
+                    pos,
+                    tickRotation,
+                    transform
+                );
+
                 _rulerTicks.Add(tick);
             }
         }
+
     }
+
 
     /// <summary>
     /// Make a list of only the 4 edges connecting sidewalls of a new extrusion 

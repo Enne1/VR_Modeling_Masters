@@ -17043,8 +17043,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rightController: {fileID: 29748419}
+  leftController: {fileID: 651223789}
   minExtrudeDistance: 0.2
-  tickPrefab: {fileID: 7893131240257742651, guid: b8a32004f5daf53478f156b8ed955f39, type: 3}
+  angledSnapTolerance: 20
+  tickPrefabSmall: {fileID: 129201073278569036, guid: 4b05b67400deeba4698e93ac7c7b8333, type: 3}
+  tickPrefabLarge: {fileID: 8341764896565244553, guid: 3dde5bfdf80e958499365156f0d112d4, type: 3}
   tickSpacing: 0.01
 --- !u!1 &1288689946
 GameObject:
@@ -20378,7 +20381,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   leftController: {fileID: 651223789}
+  rightController: {fileID: 29748419}
   minDragDistance: 0.2
+  angledSnapTolerance: 20
   normalAxisMaterial: {fileID: 2100000, guid: b796f39d0ed7e904cba7afa247a1fe2f, type: 2}
 --- !u!1 &1485071592
 GameObject:
@@ -30278,14 +30283,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1c0e72e267230442b9396c19a28152f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deselectedMat: {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
+  selectedMat: {fileID: 2100000, guid: 238906dd8082cc5418dc3021a9456f5b, type: 2}
+  leftController: {fileID: 1699961308}
   proximityScalerManager: {fileID: 1064920361}
   selectionRadius: 1
   selectionMask:
     serializedVersion: 2
     m_Bits: 64
-  deselectedMat: {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
-  selectedMat: {fileID: 2100000, guid: 238906dd8082cc5418dc3021a9456f5b, type: 2}
-  leftController: {fileID: 1699961308}
 --- !u!4 &2045677376
 Transform:
   m_ObjectHideFlags: 0

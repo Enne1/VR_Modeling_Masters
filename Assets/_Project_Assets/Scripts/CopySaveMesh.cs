@@ -69,6 +69,7 @@ public class CopySaveMesh : MonoBehaviour
             // Snap the mesh to snap point
             grabManager.GetComponent<GrapInteractor>().DetachFromController();
             other.transform.position = snapPoint.position;
+            other.transform.rotation = snapPoint.rotation;
             
             // Size down mesh
             PBUtils.NormalizeMeshSize(other.GetComponent<ProBuilderMesh>(), 0.1f);

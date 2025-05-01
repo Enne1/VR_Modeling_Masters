@@ -20,7 +20,6 @@ public class HandleUpdater : MonoBehaviour
         if (_pbMesh != null)
         {
             UpdateHandles();
-            //StoreFaceStates();
             foreach (Transform child in transform)
             {
                 child.gameObject.SetActive(false);
@@ -191,37 +190,6 @@ public class HandleUpdater : MonoBehaviour
         }
 
         return bestEdge;
-    }
-
-
-    void StoreFaceStates()
-    {
-        foreach (Face face in _pbMesh.faces)
-        {
-            if (face == null || face.indexes == null || face.indexes.Count == 0) continue;
-
-            int faceId = face.indexes.Min();
-            Vector3 faceCenter = GetFaceCenter(face);
-            Vector3 faceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, face));
-
-            if (!_faceEdges.ContainsKey(faceId))
-            {
-                _faceEdges[faceId] = GetLongestEdge(face);
-            }
-
-            Edge edge = _faceEdges[faceId];
-            if (edge.a < 0 || edge.b < 0 || edge.a >= _pbMesh.positions.Count || edge.b >= _pbMesh.positions.Count)
-                continue;
-
-            Vector3 pointA = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.a]);
-            Vector3 pointB = _pbMesh.transform.TransformPoint(_pbMesh.positions[edge.b]);
-            Vector3 edgeDir = (pointB - pointA).normalized;
-
-            Quaternion faceRotation = Quaternion.LookRotation(faceNormal.normalized, edgeDir.normalized);
-
-            _lastFaceCenters[faceId] = faceCenter;
-            _lastFaceRotations[faceId] = faceRotation;
-        }
     }
 
     /// <summary>

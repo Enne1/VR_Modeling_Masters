@@ -19,7 +19,9 @@ public class DragFace : MonoBehaviour
     private LineRenderer _normalAxisLineRenderer;
     
     public GameObject leftController;
+    public GameObject rightController;
     public float minDragDistance;
+    public float angledSnapTolerance;
     public Material normalAxisMaterial;
 
     void Start()
@@ -165,7 +167,38 @@ public class DragFace : MonoBehaviour
         float snapThreshold = 0.05f;
         float deviation = (movementDelta - constrainedMovement).magnitude;
         Vector3 finalMovement = deviation < snapThreshold ? constrainedMovement : movementDelta;
-    
+        
+        // Find face close to right controller for possible snapping based on that face' plane
+        Face rightControllerFace = GetClosestFace(rightController.transform);
+        if (rightControllerFace != null)
+        {
+            // Get right controller face' center point and normal vector
+            Vector3 rightControllerFaceCenterpoint = GetFaceCenter(rightControllerFace);
+            Vector3 rightcontrollerLocalNormal = Math.Normal(_pbMesh, rightControllerFace);
+
+            // Create plane based on the center position and the facs' normal vector
+            Vector3 snappingPlaneNormal = _pbMesh.transform.TransformDirection(rightcontrollerLocalNormal).normalized;
+            Plane snappingPlane = new Plane(snappingPlaneNormal, rightControllerFaceCenterpoint);
+
+            // Get world-space normal of the dragged face
+            Vector3 rightFaceNormal = _pbMesh.transform.TransformDirection(Math.Normal(_pbMesh, _selectedFace)).normalized;
+
+            float angleBetweenNormals = Vector3.Angle(rightFaceNormal, snappingPlaneNormal);
+
+            // If the angle between the two faces is below threshold, snap
+            if (angleBetweenNormals < angledSnapTolerance && rightControllerFace != _selectedFace)
+            {
+                Vector3 movedFaceCenter = _initialFaceCenter + finalMovement;
+                float distanceToPlane = snappingPlane.GetDistanceToPoint(movedFaceCenter);
+
+                if (Mathf.Abs(distanceToPlane) < 0.01f) 
+                {
+                    Vector3 snappedCenter = movedFaceCenter - snappingPlane.normal * distanceToPlane;
+                    finalMovement = snappedCenter - _initialFaceCenter;
+                }
+            }
+        }
+        
         // Create a mutable copy of the positions.
         List<Vector3> newPositions = new List<Vector3>(_pbMesh.positions);
     
