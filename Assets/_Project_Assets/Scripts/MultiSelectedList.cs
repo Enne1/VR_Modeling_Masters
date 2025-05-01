@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 public class MultiSelectedList : MonoBehaviour
 {
-    public List<GameObject> selectedPadlocks;
-    public List<GameObject> selectedFaces;
+    public List<GameObject> selectedPadlocks = new();
+    public List<GameObject> selectedFaces = new();
     
     
     /// <summary>

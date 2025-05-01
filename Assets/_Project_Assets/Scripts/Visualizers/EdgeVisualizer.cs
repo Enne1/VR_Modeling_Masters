@@ -7,10 +7,11 @@ public class EdgeVisualizer : MonoBehaviour
 {
     private ProBuilderMesh _pbMesh;
 
-    private Dictionary<(int, int), GameObject> _edgeMarkers;
-    private Dictionary<(int, int), Vector3> _lastMidpoints;
-    private Dictionary<int, Vector3> _lastVertexPositions;
-    private Dictionary<int, int> _vertexToSharedGroup;
+    private Dictionary<(int, int), GameObject> _edgeMarkers = new();
+    private Dictionary<(int, int), Vector3> _lastMidpoints = new();
+    private Dictionary<int, Vector3> _lastVertexPositions = new();
+    
+    private Dictionary<int, int> _vertexToSharedGroup = new();
 
     public GameObject edgePrefab;
 

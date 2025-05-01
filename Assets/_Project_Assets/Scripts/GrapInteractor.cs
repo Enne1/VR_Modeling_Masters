@@ -27,7 +27,6 @@ public class GrapInteractor : MonoBehaviour
         if (_objSelector != null && _objSelector.ClosestObj != null)
         {
             _pbMesh = _objSelector.ClosestObj.GetComponent<ProBuilderMesh>();
-           // _wireframeScript = _pbMesh.GetComponent<WireframeWithVertices>();
         }
         
         if (_isGrabbing && !_isScaling) FollowController();
@@ -60,7 +59,6 @@ public class GrapInteractor : MonoBehaviour
     /// </summary>
     public void DetachFromController()
     {
-        //_wireframeScript.updateWireframe = false;
         if (_pbMesh == null) return;
         _isGrabbing = false;
     }
@@ -71,6 +69,9 @@ public class GrapInteractor : MonoBehaviour
     /// </summary>
     void FollowController()
     {
+        _pbMesh.transform.position = rightController.transform.TransformPoint(_relativeDistance);
+        _pbMesh.transform.rotation = rightController.transform.rotation * _relativeRotation;
+        /* Snapping to axis, feels very weird to use in the vr headset
         _pbMesh.transform.position = rightController.transform.TransformPoint(_relativeDistance);
 
         // compute the desired rotation from the controller
@@ -101,6 +102,7 @@ public class GrapInteractor : MonoBehaviour
                 return nearest;
             return angle;
         }
+        */
         
     }
 

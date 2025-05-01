@@ -1,35 +1,34 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
 
 public class DeleteShape : MonoBehaviour
 {
-    private float _overlapSphereSpawnRadius = 0.2f; 
+    private float spawnRadius = 0.2f; 
     public LayerMask detectionLayer; 
-    private Material _originalMat;
+    private Material originalMat;
     public Material deleteMat;
     public Material selectedMat;
-    private HashSet<Collider> _objectsInsideTrigger;
+    private HashSet<Collider> objectsInsideTrigger = new HashSet<Collider>();  // Track objects in the trigger
     
     /// <summary>
-    /// Check if the currently grabbed object is within the trashcan
-    /// If so when the grabbed object is released, delete the mesh
+    /// Runs when a mesh is released of a grab, If the mesh is within the trashcan delete that mesh
     /// </summary>
     public void Deletion()
     {
         // Overlap detection for objects to be deleted
-        Collider[] objectsToDelete = Physics.OverlapSphere(transform.position, _overlapSphereSpawnRadius, detectionLayer);
+        Collider[] objectsToDelete = Physics.OverlapSphere(transform.position, spawnRadius, detectionLayer);
         
         // Delete all objects within the trashcan objects
         foreach (Collider obj in objectsToDelete)
         {
-            _objectsInsideTrigger.Remove(obj);
+            objectsInsideTrigger.Remove(obj);
             Destroy(obj.gameObject);
         }
     }
     
     /// <summary>
-    /// If an object enters the trashcan but is still being grabbed by the controller, turn the mesh red
+    /// Called when another collider (A mesh) enters the trashcans trigger collider
+    /// the mesh color will then turn red
     /// </summary>
     private void OnTriggerEnter(Collider other)
     {
@@ -38,12 +37,13 @@ public class DeleteShape : MonoBehaviour
         {
             // Change material to 'deleteMat' when entering
             other.gameObject.GetComponent<MeshRenderer>().material = deleteMat;
-            _objectsInsideTrigger.Add(other); 
+            objectsInsideTrigger.Add(other);  // Add to the list of objects inside
         }
     }
 
     /// <summary>
-    /// Revert mesh color back to normal when exiting the trashcan trigger
+    /// Called when another collider (A mesh) exits the trashcans trigger collider
+    /// the mesh color will then turn back to its original color
     /// </summary>
     private void OnTriggerExit(Collider other)
     {
@@ -51,23 +51,10 @@ public class DeleteShape : MonoBehaviour
         if ((detectionLayer.value & (1 << other.gameObject.layer)) != 0)
         {
             // Only reset the material if it was previously inside the trigger
-            if (_objectsInsideTrigger.Contains(other))
+            if (objectsInsideTrigger.Contains(other))
             {
                 other.gameObject.GetComponent<MeshRenderer>().material = selectedMat;
-                _objectsInsideTrigger.Remove(other);
-            }
-        }
-    }
-    
-    private void Update()
-    {
-        // Check for all objects currently inside the trigger and make sure they are still within bounds.
-        foreach (var obj in _objectsInsideTrigger)
-        {
-            if (!GetComponent<Collider>().bounds.Intersects(obj.bounds))
-            {
-                obj.gameObject.GetComponent<MeshRenderer>().material = selectedMat;
-                _objectsInsideTrigger.Remove(obj);
+                objectsInsideTrigger.Remove(other);  // Remove from the list of objects inside
             }
         }
     }

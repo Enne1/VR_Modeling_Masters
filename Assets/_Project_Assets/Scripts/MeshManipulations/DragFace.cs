@@ -11,10 +11,10 @@ public class DragFace : MonoBehaviour
     private Vector3 _initialControllerPos;
     private Vector3 _initialFaceCenter;
     private Vector3 _currControllerPos;
-    private List<Face> _dragAlongFaces;
+    private List<Face> _dragAlongFaces = new();
 
-    private HashSet<int> _selectedVertexIndices;
-    private Dictionary<int, Vector3> _initialVertexWorldPositions;
+    private HashSet<int> _selectedVertexIndices = new();
+    private Dictionary<int, Vector3> _initialVertexWorldPositions = new();
     
     private LineRenderer _normalAxisLineRenderer;
     

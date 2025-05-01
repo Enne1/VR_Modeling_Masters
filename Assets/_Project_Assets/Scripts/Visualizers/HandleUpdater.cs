@@ -6,10 +6,10 @@ using System.Linq;
 public class HandleUpdater : MonoBehaviour
 {
     private ProBuilderMesh _pbMesh;
-    private Dictionary<int, GameObject> _faceHandles;
-    private Dictionary<int, Vector3> _lastFaceCenters;
-    private Dictionary<int, Quaternion> _lastFaceRotations;
-    private Dictionary<int, Edge> _faceEdges;
+    private Dictionary<int, GameObject> _faceHandles = new();
+    private Dictionary<int, Vector3> _lastFaceCenters = new();
+    private Dictionary<int, Quaternion> _lastFaceRotations = new();
+    private Dictionary<int, Edge> _faceEdges = new();
 
     public GameObject handlePrefab;
 
@@ -20,7 +20,7 @@ public class HandleUpdater : MonoBehaviour
         if (_pbMesh != null)
         {
             UpdateHandles();
-            StoreFaceStates();
+            //StoreFaceStates();
             foreach (Transform child in transform)
             {
                 child.gameObject.SetActive(false);
@@ -123,6 +123,7 @@ public class HandleUpdater : MonoBehaviour
                 Vector3.Normalize(longestEdgeDir)
             );
 
+            // Update handle position/rotation if handle already exists
             if (_faceHandles.ContainsKey(faceId))
             {
                 GameObject handle = _faceHandles[faceId];
@@ -132,6 +133,7 @@ public class HandleUpdater : MonoBehaviour
                     handle.transform.rotation = faceRotation;
                 }
             }
+            //If handle does not exist, make a new handle
             else
             {
                 GameObject handle = Instantiate(handlePrefab, faceCenter, faceRotation);
@@ -145,6 +147,9 @@ public class HandleUpdater : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Calculate the center of the face
+    /// </summary>
     Vector3 GetFaceCenter(Face face)
     {
         Vector3 sum = Vector3.zero;
@@ -155,6 +160,9 @@ public class HandleUpdater : MonoBehaviour
         return sum / face.indexes.Count;
     }
 
+    /// <summary>
+    /// Find the longest edge of a face, used for determining the rotation of the handles
+    /// </summary>
     Edge GetLongestEdge(Face face)
     {
         if (face == null || face.edges == null) return default;
@@ -184,6 +192,7 @@ public class HandleUpdater : MonoBehaviour
 
         return bestEdge;
     }
+
 
     void StoreFaceStates()
     {
@@ -215,6 +224,9 @@ public class HandleUpdater : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Remove all handle signifiers when they need to be rebuild
+    /// </summary>
     public void ClearAll()
     {
         _faceHandles.Clear();
@@ -237,6 +249,9 @@ public class HandleUpdater : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Clear and readd the signifiers. Fx when making an undo/redo
+    /// </summary>
     public void RebuildHandles()
     {
         if (_pbMesh == null) _pbMesh = GetComponent<ProBuilderMesh>();

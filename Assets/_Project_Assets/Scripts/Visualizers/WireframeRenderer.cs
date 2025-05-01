@@ -8,7 +8,7 @@ using UnityEngine;
  {
      public Color wireColor = Color.green;
      private ProBuilderMesh _pbMesh;
-     private HashSet<Edge> _quadEdges;
+     private HashSet<Edge> _quadEdges = new HashSet<Edge>();
      private int _lastVertexCount;
      public Material wireframeMaterial;
 
@@ -20,7 +20,7 @@ using UnityEngine;
 
     private void Update()
     {
-        // Check if the mesh has changed
+        // Check if the mesh has changede
         if (_pbMesh.vertexCount != _lastVertexCount)
         {
             UpdateWireframe();
@@ -47,19 +47,19 @@ using UnityEngine;
         GL.End(); 
     }
 
- 
     /// <summary>
     /// Continuously find the edges that should have a wireframe line drawn between them 
     /// </summary>
      private void UpdateWireframe()
      {
          _quadEdges.Clear(); 
+         
          Dictionary<Edge, int> edgeCount = new Dictionary<Edge, int>();
  
          // Loop over each face in the mesh
          foreach (Face face in _pbMesh.faces)
          {
-             if (face.edges.Count == 4)
+             if (face.edges.Count == 4) 
              {
                  foreach (Edge edge in face.edges)
                  {
@@ -80,10 +80,9 @@ using UnityEngine;
          _pbMesh.Refresh();
      }
      
- 
-    /// <summary>
-    /// Get point A and B for the edge which a line should be drawn between
-    /// </summary>
+     /// <summary>
+     /// Get point A and B for the edge which a line should be drawn between
+     /// </summary>
      private void DrawEdge(Vector3 v0, Vector3 v1)
      {
          GL.Vertex(transform.TransformPoint(v0));

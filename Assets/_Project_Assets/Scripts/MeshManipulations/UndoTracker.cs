@@ -6,8 +6,8 @@ using UnityEngine.ProBuilder;
 public class UndoTracker : MonoBehaviour
 {
     private ProBuilderMesh _pbMesh;
-    private Stack<GameObject> _undoStack;
-    private Stack<GameObject> _redoStack;
+    private Stack<GameObject> _undoStack = new();
+    private Stack<GameObject> _redoStack = new();
 
     public int maxUndoSteps = 50;
 

@@ -11,9 +11,9 @@ public class ProximityScaler : MonoBehaviour
     public float startScale = 0.02f;
 
     private GameObject _currObj;
-    private List<Transform> _scalable;
-    private HashSet<Transform> _scalableSet;
-    private Dictionary<Transform, Vector3> _originalScale;
+    private List<Transform> _scalable = new();
+    private HashSet<Transform> _scalableSet = new();
+    private Dictionary<Transform, Vector3> _originalScale = new();
     private float _invRange;
 
     void Awake()

@@ -8,12 +8,12 @@ public class DragVertex : MonoBehaviour
 {
     private ObjSelector _objSelector;
     private ProBuilderMesh _pbMesh;
-    private HashSet<int> _selectedVertexIndices;
+    private HashSet<int> _selectedVertexIndices = new();
     private bool _isDragging;
     private Vector3 _initialControllerPos;
-    private Dictionary<int, Vector3> _initialVertexPositions;
+    private Dictionary<int, Vector3> _initialVertexPositions = new();
     private Transform _activeController;
-    private List<GameObject> _dragAlongList;
+    private List<GameObject> _dragAlongList = new();
     private GameObject[] _dragAlongGameObjects;
     
     void Start()
