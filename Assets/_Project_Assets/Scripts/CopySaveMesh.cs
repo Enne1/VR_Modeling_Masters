@@ -68,6 +68,8 @@ public class CopySaveMesh : MonoBehaviour
             
             // Snap the mesh to snap point
             grabManager.GetComponent<GrapInteractor>().DetachFromController();
+            grabManager.GetComponent<GrapInteractorHand>().DetachFromController();
+            
             other.transform.position = snapPoint.position;
             other.transform.rotation = snapPoint.rotation;
             

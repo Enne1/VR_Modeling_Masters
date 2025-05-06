@@ -263,6 +263,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3705839}
   - component: {fileID: 3705838}
+  - component: {fileID: 3705840}
   m_Layer: 0
   m_Name: GrapScaleManager
   m_TagString: Untagged
@@ -300,6 +301,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1765071498}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3705840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3705837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fb8d33f92141754c876cbf27e810686, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rightController: {fileID: 29748419}
+  leftController: {fileID: 651223789}
+  maxAllowedGrabDistance: 0.5
+  handModelsL: []
+  handModelsR: []
 --- !u!1 &10119015
 GameObject:
   m_ObjectHideFlags: 0
@@ -10547,7 +10565,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 2045677375}
           m_TargetAssemblyTypeName: ObjSelector, Assembly-CSharp
-          m_MethodName: SelectObj
+          m_MethodName: SelectObjLeft
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -12194,9 +12212,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 17685162}
   - {fileID: 3568255874454992397}
   - {fileID: 6716256389943426156}
-  - {fileID: 17685162}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &870158624
@@ -13044,6 +13062,68 @@ Transform:
   m_Children: []
   m_Father: {fileID: 851933443}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &940352972
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3568255874454992397}
+    m_Modifications:
+    - target: {fileID: 232588572131890134, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_Name
+      value: Desk_Simple
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+--- !u!4 &940352973 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1864158040549843799, guid: ef5647be8a1b29c479250c3874bd0b53, type: 3}
+  m_PrefabInstance: {fileID: 940352972}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &940854764
 GameObject:
   m_ObjectHideFlags: 0
@@ -30286,11 +30366,13 @@ MonoBehaviour:
   deselectedMat: {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
   selectedMat: {fileID: 2100000, guid: 238906dd8082cc5418dc3021a9456f5b, type: 2}
   leftController: {fileID: 1699961308}
+  rightController: {fileID: 1978056008}
   proximityScalerManager: {fileID: 1064920361}
   selectionRadius: 1
   selectionMask:
     serializedVersion: 2
     m_Bits: 64
+  grapManager: {fileID: 3705837}
 --- !u!4 &2045677376
 Transform:
   m_ObjectHideFlags: 0
@@ -31891,7 +31973,11 @@ PrefabInstance:
     - {fileID: 3601317341263862409, guid: 5af030dfd800b554f8fca356cbb35347, type: 3}
     - {fileID: 7019983829226153940, guid: 5af030dfd800b554f8fca356cbb35347, type: 3}
     - {fileID: 5829158916450463292, guid: 5af030dfd800b554f8fca356cbb35347, type: 3}
+    - {fileID: 5295269208302226766, guid: 5af030dfd800b554f8fca356cbb35347, type: 3}
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7307095050243199762, guid: 5af030dfd800b554f8fca356cbb35347, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 940352973}
     - targetCorrespondingSourceObject: {fileID: 3572601491838868526, guid: 5af030dfd800b554f8fca356cbb35347, type: 3}
       insertIndex: -1
       addedObject: {fileID: 452624091}
