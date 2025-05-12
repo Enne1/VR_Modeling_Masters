@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 using UnityEngine.ProBuilder;
 using UnityEngine.ProBuilder.MeshOperations;
@@ -10,6 +11,8 @@ public class SelectionManager : MonoBehaviour
     public float selectionRadius = 0.1f;  // Sphere radius for detection
     public float maxSelectionDistance = 0.1f; // Max raycast distance
     public LayerMask selectionMask;
+    public string[] triggerSelectionNames;
+    public string[] buttonSelectionNames;
     
     [Header("Managers")]
     public GameObject extrudeManager;
@@ -35,7 +38,7 @@ public class SelectionManager : MonoBehaviour
     /// <summary>
     /// Finds the closest signifier to the controller when either the left or right trigger is pressed
     /// </summary>
-    private void SelectObject(Transform controller)
+    private void SelectObject(Transform controller, bool isTriggerButton)
     {
         // Lists all signifiers within the shpere of selection
         Collider[] hits = Physics.OverlapSphere(
@@ -49,8 +52,12 @@ public class SelectionManager : MonoBehaviour
         foreach (Collider hit in hits)
         {
             float distance = Vector3.Distance(controller.position, hit.transform.position);
-
-            if (distance < closestDistance)
+            if (isTriggerButton && distance < closestDistance && triggerSelectionNames.Any(part => hit.transform.name.Contains(part)))
+            {
+                closestDistance = distance;
+                // store the closest signifier
+                _closestObject = hit.transform.gameObject;
+            } else if (!isTriggerButton && distance < closestDistance && buttonSelectionNames.Any(part => hit.transform.name.Contains(part)))
             {
                 closestDistance = distance;
                 // store the closest signifier
@@ -227,7 +234,7 @@ public class SelectionManager : MonoBehaviour
         {
             _rightTrigger = true;
             _rightIsActive = true;
-            SelectObject(rightController);
+            SelectObject(rightController, true);
         }
     }
 
@@ -253,7 +260,7 @@ public class SelectionManager : MonoBehaviour
         {
             _rightTrigger = false;
             _leftIsActive = true;
-            SelectObject(leftController);
+            SelectObject(leftController, true);
         }
     }
 
@@ -270,5 +277,10 @@ public class SelectionManager : MonoBehaviour
             _proximityScript = proximityScaler.GetComponent<ProximityScaler>();
             _proximityScript.ResetScales();
         }
+    }
+
+    public void SelectionButtonDown()
+    {
+        SelectObject(leftController, false);
     }
 }

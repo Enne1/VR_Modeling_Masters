@@ -1741,6 +1741,7 @@ Transform:
   - {fileID: 1447461916}
   - {fileID: 574531698}
   - {fileID: 1833230471}
+  - {fileID: 609466710}
   m_Father: {fileID: 1712250036}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &88833298
@@ -6786,6 +6787,7 @@ GameObject:
   m_Component:
   - component: {fileID: 457578108}
   - component: {fileID: 457578107}
+  - component: {fileID: 457578109}
   m_Layer: 0
   m_Name: DebugConsolGUI
   m_TagString: Untagged
@@ -6821,6 +6823,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1726093735}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &457578109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457578106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8e266b2e98bec944b97252449cab0af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 1899561114}
 --- !u!1 &460545519
 GameObject:
   m_ObjectHideFlags: 0
@@ -8310,7 +8325,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
+  - {fileID: 2100000, guid: 36cd4e41cbb803c4dbd5321d4af1c8d4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -9026,6 +9041,115 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1848265432}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &609466709
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 609466710}
+  - component: {fileID: 609466713}
+  - component: {fileID: 609466712}
+  - component: {fileID: 609466711}
+  m_Layer: 0
+  m_Name: SignifierSelectIcon
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &609466710
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609466709}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.045827236, y: -0.990247, z: 0.10355788, w: 0.08115703}
+  m_LocalPosition: {x: 0.027, y: 0.00535, z: 0.00863}
+  m_LocalScale: {x: 0.0015, y: 0.0015, z: 0.0015}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 87912802}
+  m_LocalEulerAnglesHint: {x: 11.4, y: -170, z: 6.3}
+--- !u!64 &609466711
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609466709}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &609466712
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609466709}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 4ea579d0a300e044091fafea04a1550d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &609466713
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 609466709}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &623268106
 GameObject:
   m_ObjectHideFlags: 0
@@ -10604,6 +10728,25 @@ MonoBehaviour:
         - m_Target: {fileID: 457578107}
           m_TargetAssemblyTypeName: ConsoleToGUI, Assembly-CSharp
           m_MethodName: ClearLog
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Title: ToggleLog
+    Button: 32768
+    ButtonMode: 1
+    InputActionReference: {fileID: 0}
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 457578109}
+          m_TargetAssemblyTypeName: ToggleDebugger, Assembly-CSharp
+          m_MethodName: CanvasToggle
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -16401,6 +16544,25 @@ MonoBehaviour:
         - m_Target: {fileID: 2045677377}
           m_TargetAssemblyTypeName: SelectionManager, Assembly-CSharp
           m_MethodName: RightIndexTriggerUp
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Title: YButtonDown
+    Button: 8
+    ButtonMode: 1
+    InputActionReference: {fileID: 0}
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2045677377}
+          m_TargetAssemblyTypeName: SelectionManager, Assembly-CSharp
+          m_MethodName: SelectionButtonDown
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -26163,7 +26325,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 43cc0e424a196e340832507dc0f397c2, type: 2}
+  - {fileID: 2100000, guid: 36cd4e41cbb803c4dbd5321d4af1c8d4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -27090,7 +27252,7 @@ GameObject:
   - component: {fileID: 1833230473}
   - component: {fileID: 1833230472}
   m_Layer: 0
-  m_Name: SelectIcon
+  m_Name: ObjSelectIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27105,7 +27267,7 @@ Transform:
   m_GameObject: {fileID: 1833230470}
   serializedVersion: 2
   m_LocalRotation: {x: -0.089289166, y: -0.979965, z: 0.16398363, w: 0.06932165}
-  m_LocalPosition: {x: 0.0147, y: 0.001, z: -0.0147}
+  m_LocalPosition: {x: 0.0123, y: -0, z: -0.0187}
   m_LocalScale: {x: 0.0015, y: 0.0015, z: 0.0015}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -28479,7 +28641,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1899561115
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30407,6 +30569,13 @@ MonoBehaviour:
   selectionMask:
     serializedVersion: 2
     m_Bits: 128
+  triggerSelectionNames:
+  - FaceHandle
+  - Sphere
+  buttonSelectionNames:
+  - FaceSelector
+  - Edge
+  - Padlock
   extrudeManager: {fileID: 1283808456}
   dragManager: {fileID: 1483968726}
   vertexDragManager: {fileID: 1631216594}
