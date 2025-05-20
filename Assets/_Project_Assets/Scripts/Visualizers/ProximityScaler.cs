@@ -72,29 +72,56 @@ public class ProximityScaler : MonoBehaviour
     /// </summary>
     void ScaleSignifiers()
     {
+
+        int _maxCount = 300;
+        
         Vector3 lp = leftController.position;
         Vector3 rp = rightController.position;
 
-        // Loop over all signifiers
-        for (int i = 0, n = _scalable.Count; i < n; i++)
+        int nearbyCount = 0;
+        float maxDistSqr = maxDistance * maxDistance;
+
+        // First pass: count how many signifiers are within maxDistance
+        foreach (var t in _scalable)
         {
-            var t = _scalable[i];
             if (t == null || ParentIsScaled(t)) continue;
 
-            // Calculate what the scale of the signifier should be
             float sqrD1 = (t.position - lp).sqrMagnitude;
             float sqrD2 = (t.position - rp).sqrMagnitude;
-            float d = Mathf.Sqrt(Mathf.Min(sqrD1, sqrD2));
 
-            float norm = Mathf.Clamp01((d - minDistance) * _invRange);
+            if (Mathf.Min(sqrD1, sqrD2) < maxDistSqr)
+            {
+                nearbyCount++;
+                if (nearbyCount > _maxCount)
+                    break;
+            }
+        }
+
+        bool collapseAll = nearbyCount > _maxCount;
+
+        // Second pass: apply scale
+        foreach (var t in _scalable)
+        {
+            if (t == null || ParentIsScaled(t)) continue;
 
             Vector3 maxS = _originalScale[t];
             Vector3 minS = maxS * 0.1f;
-            
-            // Set the signifiers scale
+
+            if (collapseAll)
+            {
+                t.localScale = minS;
+                continue;
+            }
+
+            float sqrD1 = (t.position - lp).sqrMagnitude;
+            float sqrD2 = (t.position - rp).sqrMagnitude;
+            float d = Mathf.Sqrt(Mathf.Min(sqrD1, sqrD2));
+            float norm = Mathf.Clamp01((d - minDistance) * _invRange);
+
             t.localScale = Vector3.Lerp(maxS, minS, norm);
         }
     }
+
     
     bool ParentIsScaled(Transform t)
     {
