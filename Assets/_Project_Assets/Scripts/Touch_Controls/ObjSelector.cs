@@ -18,7 +18,7 @@ public class ObjSelector : MonoBehaviour
     public LayerMask selectionMask;
     
     public GameObject grapManager;
-    private GrapInteractorHand _grapScript;
+    private GrapInteractor _grapScript;
         
     /// <summary>
     /// Find and select the closest object to the controller when "X" on the left controller is pressed
@@ -71,7 +71,7 @@ public class ObjSelector : MonoBehaviour
         _proximityScaler = proximityScalerManager.GetComponent<ProximityScaler>();
         _proximityScaler.SetScales(ClosestObj);
         
-        _grapScript = grapManager.GetComponent<GrapInteractorHand>();
+        _grapScript = grapManager.GetComponent<GrapInteractor>();
         _grapScript.getMeshFromSelector(ClosestObj);
         
         // Set the closest object to the selected material and enable its signifiers

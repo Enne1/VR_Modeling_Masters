@@ -13,6 +13,12 @@ public class SelectionManager : MonoBehaviour
     public LayerMask selectionMask;
     public string[] triggerSelectionNames;
     public string[] buttonSelectionNames;
+
+    public Material vertexNormalMat;
+    public Material vertexSelectedMat;
+    public Material handleNormalMat;
+    public Material handleExtrudedMat;
+    public Material handleDraggedMat;
     
     [Header("Managers")]
     public GameObject extrudeManager;
@@ -31,7 +37,7 @@ public class SelectionManager : MonoBehaviour
     private ProximityScaler _proximityScript;
     
     //Private variables
-    private string _currentSelection;
+    private GameObject _currentSelection;
     private bool _rightTrigger;
     private GameObject _closestObject;
     
@@ -77,7 +83,7 @@ public class SelectionManager : MonoBehaviour
     /// </summary>
     private void HandleSelection(GameObject selectedObject)
     {
-        _currentSelection = selectedObject.tag;
+        _currentSelection = selectedObject;
         
         // look for which signifier type was selected
         switch (selectedObject.tag)
@@ -87,12 +93,16 @@ public class SelectionManager : MonoBehaviour
                 // If right hand controller was used to select, run Extrusion
                 if (_rightTrigger)
                 {
+                    _currentSelection.GetComponent<MeshRenderer>().material = handleExtrudedMat;
+                    
                     _extrudeScript = extrudeManager.GetComponent<ExtrudeFeature>();
                     _extrudeScript.CallExtrusion();
                 }
                 // If left hand controller was used to select, run Dragging
                 else
                 {
+                    _currentSelection.GetComponent<MeshRenderer>().material = handleDraggedMat;
+                    
                     _dragScript = dragManager.GetComponent<DragFace>();
                     _dragScript.StartDraggingFace();
                 }
@@ -100,6 +110,7 @@ public class SelectionManager : MonoBehaviour
 
             // Case: the closest signifier is a Vertex
             case "VertexMarker":
+                _currentSelection.GetComponent<MeshRenderer>().material = vertexSelectedMat;
                 // Start vertex dragging based on which controller is used
                 if (_rightTrigger)
                 {
@@ -183,18 +194,20 @@ public class SelectionManager : MonoBehaviour
     // Stop a signifier selection when trigger button is released
     void StopSelection()
     {
-        switch (_currentSelection)
+        switch (_currentSelection.tag)
         {
             // Case: the closest signifier is a Handle
             case "FaceHandle":
                 // If right hand controller was used to select, stop Extrusion
+                _currentSelection.GetComponent<MeshRenderer>().material = handleNormalMat;
+                
                 if (_rightTrigger)
                 {
                     _extrudeScript.StopDraggingFace();
                     
                     // Check if faces can be merged
-                    _mergeScript = mergeManager.GetComponent<MergeFaces>();
-                    _mergeScript.MergeCloseFaces();
+                    //_mergeScript = mergeManager.GetComponent<MergeFaces>();
+                    //_mergeScript.MergeCloseFaces();
                 }
                 // If left hand controller was used to select, stop Dragging
                 else
@@ -202,15 +215,17 @@ public class SelectionManager : MonoBehaviour
                     _dragScript.StopDraggingFace();
                     
                     // Check if faces can be merged
-                    _mergeScript = mergeManager.GetComponent<MergeFaces>();
-                    _mergeScript.MergeCloseFaces();
+                   // _mergeScript = mergeManager.GetComponent<MergeFaces>();
+                    //_mergeScript.MergeCloseFaces();
                 }
                 break;
             // Case: the closest signifier is a vertex
             case "VertexMarker":
+                _currentSelection.GetComponent<MeshRenderer>().material = vertexNormalMat;
+                
                 // Stop dragging the vertex
                 _vertexDragScript.StopDraggingVertex();
-                _mergeScript.MergeCloseFaces();
+                //_mergeScript.MergeCloseFaces();
                 break;
             case "PadlockMarker":
                 break;

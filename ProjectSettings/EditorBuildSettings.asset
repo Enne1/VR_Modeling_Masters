@@ -5,13 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/_Project_Assets/Scenes/VR_Modeling.unity
     guid: 8eb9df92e4756c44cb0f1a5562382926
   - enabled: 0
     path: Assets/_Project_Assets/Scenes/Testing.unity
     guid: 550109a5510da45468aa4706f586615e
-  - enabled: 1
+  - enabled: 0
     path: Assets/_Project_Assets/Scenes/Hand_Controls.unity
     guid: 8539de72c5c4623499e729f0ebabc856
   m_configObjects:
