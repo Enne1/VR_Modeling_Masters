@@ -227,12 +227,6 @@ public class SelectionManager : MonoBehaviour
                 _vertexDragScript.StopDraggingVertex();
                 //_mergeScript.MergeCloseFaces();
                 break;
-            case "PadlockMarker":
-                break;
-            case "FaceLocker":
-                break;
-            case "LoopCutMarker":
-                break;
             default:
                 break;
         }

@@ -127,13 +127,6 @@ public class GrapInteractor : MonoBehaviour
         _initialScale = transform.localScale;
     }
 
-    /// <summary>
-    /// stop the mesh from scaling when one of the hand trigger buttons are released
-    /// </summary>
-    void StopScaling()
-    {
-        _isScaling = false;
-    }
 
     /// <summary>
     /// Uses a spherical overlap check to see if the controller is close to any part of the object.
