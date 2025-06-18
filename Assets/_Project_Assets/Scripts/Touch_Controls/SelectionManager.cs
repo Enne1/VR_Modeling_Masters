@@ -204,19 +204,11 @@ public class SelectionManager : MonoBehaviour
                 if (_rightTrigger)
                 {
                     _extrudeScript.StopDraggingFace();
-                    
-                    // Check if faces can be merged
-                    //_mergeScript = mergeManager.GetComponent<MergeFaces>();
-                    //_mergeScript.MergeCloseFaces();
                 }
                 // If left hand controller was used to select, stop Dragging
                 else
                 {
                     _dragScript.StopDraggingFace();
-                    
-                    // Check if faces can be merged
-                   // _mergeScript = mergeManager.GetComponent<MergeFaces>();
-                    //_mergeScript.MergeCloseFaces();
                 }
                 break;
             // Case: the closest signifier is a vertex
@@ -225,7 +217,6 @@ public class SelectionManager : MonoBehaviour
                 
                 // Stop dragging the vertex
                 _vertexDragScript.StopDraggingVertex();
-                //_mergeScript.MergeCloseFaces();
                 break;
             default:
                 break;

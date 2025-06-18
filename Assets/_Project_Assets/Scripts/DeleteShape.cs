@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class DeleteShape : MonoBehaviour
 {
-    private float spawnRadius = 0.2428563f;//0.2f; 
+    private float spawnRadius = 0.2428563f;
     public LayerMask detectionLayer; 
     private Material originalMat;
     public Material deleteMat;

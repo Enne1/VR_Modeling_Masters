@@ -59,8 +59,20 @@ public class HandleUpdater : MonoBehaviour
             Vector3 pointB = _pbMesh.transform.TransformPoint(_pbMesh.positions[longestEdge.b]);
             Vector3 edgeDir = (pointB - pointA).normalized;
 
-            Quaternion currentRotation = Quaternion.LookRotation(faceNormal.normalized, edgeDir.normalized);
+            Quaternion currentRotation;
 
+            if (faceNormal.sqrMagnitude > 0.0001f)
+            {
+                currentRotation = Quaternion.LookRotation(faceNormal.normalized, edgeDir.normalized);
+                // ... rest of your code
+            }
+            else
+            {
+                // Fallback rotation if faceNormal is zero
+                currentRotation = Quaternion.identity;
+                // Or some other default rotation that makes sense in your context
+            }
+            
             bool centerChanged = !_lastFaceCenters.ContainsKey(faceId) || Vector3.Distance(_lastFaceCenters[faceId], currentCenter) > 0.001f;
             bool rotationChanged = !_lastFaceRotations.ContainsKey(faceId) || Quaternion.Angle(_lastFaceRotations[faceId], currentRotation) > 0.1f;
 
